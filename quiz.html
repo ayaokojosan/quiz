@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>三富成之助の特訓クイズ</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f5f7ff;
+  --card:#ffffff;
+  --border:#dde5f5;
+  --primary:#3C3489;
+  --primary-light:#EEEDFE;
+  --text:#1a1a2e;
+  --text2:#5566aa;
+  --text3:#9aaabb;
+  --ok:#0F6E56;
+  --ok-bg:#E1F5EE;
+  --ok-border:#1D9E75;
+  --ng:#993C1D;
+  --ng-bg:#FAECE7;
+  --ng-border:#D85A30;
+  --hint-bg:#EEEDFE;
+  --hint-text:#3C3489;
+}
+body{font-family:-apple-system,'Hiragino Maru Gothic ProN','M PLUS Rounded 1c',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);padding:12px;}
+h1{text-align:center;font-size:20px;color:var(--primary);margin-bottom:3px;font-weight:700;}
+.subtitle{text-align:center;font-size:12px;color:var(--text2);margin-bottom:14px;}
+
+.top-tabs{display:flex;gap:6px;justify-content:center;margin-bottom:14px;flex-wrap:wrap;}
+.ttab{padding:8px 16px;border-radius:20px;border:2px solid var(--border);background:#fff;font-size:13px;cursor:pointer;color:var(--text2);font-family:inherit;font-weight:700;transition:all .15s;}
+.ttab.on{background:var(--primary);border-color:var(--primary);color:#fff;}
+
+.screen{display:none;}.screen.active{display:block;}
+
+/* カード */
+.sub-tabs{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;}
+.stab{padding:6px 12px;border-radius:16px;border:2px solid var(--border);background:#fff;font-size:12px;cursor:pointer;color:var(--text2);font-family:inherit;font-weight:700;}
+.stab.on{background:var(--primary);border-color:var(--primary);color:#fff;}
+.pbar-wrap{max-width:520px;margin:0 auto 12px;}
+.pbar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.pfill{height:100%;background:var(--primary);border-radius:3px;transition:width .3s;}
+.ctr{text-align:center;font-size:13px;color:var(--text2);margin-bottom:8px;}
+.card-wrap{max-width:520px;margin:0 auto 12px;}
+.card{border-radius:16px;border:2px solid var(--border);background:var(--card);overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(60,52,137,.06);}
+.cfront,.cback{padding:18px 18px 14px;}
+.cback{display:none;border-top:2px solid var(--border);background:var(--hint-bg);}
+.cback.show{display:block;}
+.sbadge{font-size:11px;padding:3px 10px;border-radius:10px;background:var(--border);color:var(--text2);display:inline-block;margin-bottom:8px;font-weight:700;}
+.qlabel{font-size:11px;color:var(--text3);margin-bottom:5px;letter-spacing:.04em;}
+.qtext{font-size:15px;font-weight:700;color:var(--text);line-height:1.7;margin-bottom:8px;white-space:pre-wrap;}
+.mapa{width:100%;margin-bottom:6px;}
+.taphint{font-size:12px;color:var(--text3);text-align:center;padding:6px 0;}
+.alabel{font-size:11px;color:var(--primary);margin-bottom:3px;letter-spacing:.04em;}
+.atext{font-size:20px;font-weight:700;color:var(--primary);margin-bottom:8px;}
+.hintbox{font-size:12px;color:var(--hint-text);background:#fff;border-radius:10px;padding:8px 12px;line-height:1.8;}
+.cautbox{font-size:12px;color:var(--ng);background:var(--ng-bg);border-radius:10px;padding:6px 12px;margin-top:6px;}
+
+.img-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;max-width:520px;margin-left:auto;margin-right:auto;}
+.ichoice{border:2px solid var(--border);border-radius:12px;background:#fff;cursor:pointer;padding:10px 8px 7px;text-align:center;transition:all .15s;}
+.ichoice:hover{border-color:var(--primary);background:var(--primary-light);}
+.ichoice.ic-correct{border-color:var(--ok-border);background:var(--ok-bg);pointer-events:none;}
+.ichoice.ic-wrong{border-color:var(--ng-border);background:var(--ng-bg);pointer-events:none;}
+.ichoice.ic-disabled{pointer-events:none;opacity:.4;}
+.iclabel{font-size:12px;color:var(--text2);margin-top:5px;font-weight:700;}
+
+.btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:6px;max-width:520px;margin-left:auto;margin-right:auto;}
+.btn{padding:8px 16px;border-radius:10px;border:2px solid var(--border);background:#fff;font-size:13px;cursor:pointer;color:var(--text);font-family:inherit;font-weight:700;transition:all .12s;}
+.btn:hover{background:var(--border);}
+.btn-ok{border-color:var(--ok-border);color:var(--ok);}
+.btn-ok:hover{background:var(--ok-bg);}
+.btn-ng{border-color:var(--ng-border);color:var(--ng);}
+.btn-ng:hover{background:var(--ng-bg);}
+.jrow{display:none;}.jrow.show{display:flex;}
+
+.fb{text-align:center;font-size:14px;font-weight:700;min-height:20px;margin-bottom:6px;max-width:520px;margin-left:auto;margin-right:auto;}
+.fb.ok{color:var(--ok);}
+.fb.ng{color:var(--ng);}
+.explainb{background:var(--hint-bg);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--hint-text);line-height:1.8;display:none;margin-bottom:8px;max-width:520px;margin-left:auto;margin-right:auto;}
+.explainb.show{display:block;}
+
+.complete{text-align:center;padding:30px 16px;display:none;max-width:520px;margin:0 auto;}
+.note-sec{margin-top:18px;border:2px solid var(--border);border-radius:14px;padding:14px;text-align:left;}
+.note-t{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px;}
+.note-i{font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);line-height:1.7;color:var(--text2);}
+.note-i:last-child{border-bottom:none;}
+.note-a{color:var(--primary);font-weight:700;}
+
+/* 成り立ち */
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;max-width:520px;margin-left:auto;margin-right:auto;}
+.tcard{border-radius:14px;border:2px solid var(--border);background:#fff;padding:14px 12px;cursor:pointer;transition:all .15s;box-shadow:0 2px 8px rgba(60,52,137,.04);}
+.tcard:hover{border-color:var(--primary);background:var(--primary-light);}
+.tnum{font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;display:inline-block;margin-bottom:6px;}
+.tname{font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.tshort{font-size:11px;color:var(--text2);line-height:1.5;}
+.detsec{background:#fff;border:2px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;max-width:520px;margin-left:auto;margin-right:auto;}
+.dettitle{font-size:17px;font-weight:700;margin-bottom:4px;}
+.detsub{font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.7;}
+.exrow{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;}
+.echip{padding:6px 14px;border-radius:10px;font-size:15px;font-weight:700;}
+.backbtn{padding:7px 14px;border-radius:10px;border:2px solid var(--border);background:#fff;font-size:13px;cursor:pointer;color:var(--text2);font-family:inherit;font-weight:700;margin-bottom:12px;display:block;}
+
+/* タイムアタック */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;max-width:520px;margin-left:auto;margin-right:auto;}
+.mcard{border:2px solid var(--border);border-radius:12px;padding:12px 10px;cursor:pointer;background:#fff;transition:all .15s;}
+.mcard:hover,.mcard.sel{border-color:var(--primary);background:var(--primary-light);}
+.mlabel{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.mdesc{font-size:11px;color:var(--text2);}
+.sf-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+.sf{padding:6px 12px;border-radius:16px;border:2px solid var(--border);background:#fff;font-size:12px;cursor:pointer;color:var(--text2);font-family:inherit;font-weight:700;}
+.sf.on{background:var(--primary);border-color:var(--primary);color:#fff;}
+.startbtn{width:100%;max-width:280px;padding:14px;border-radius:12px;background:var(--primary);border:none;color:#fff;font-size:15px;font-family:inherit;cursor:pointer;font-weight:700;display:block;margin:0 auto;transition:all .15s;}
+.startbtn:hover{background:#534AB7;}
+
+.qhdr{display:flex;align-items:center;gap:8px;margin-bottom:10px;max-width:520px;margin-left:auto;margin-right:auto;}
+.tbox{display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:18px;border:2px solid var(--border);background:#fff;}
+.tnum2{font-size:18px;font-weight:700;min-width:28px;}
+.tnum2.warn{color:var(--ng);}
+.slive{font-size:13px;color:var(--primary);font-weight:700;}
+.qcnt{margin-left:auto;font-size:12px;color:var(--text2);}
+.qbox{background:#fff;border:2px solid var(--border);border-radius:14px;padding:16px 14px 12px;margin-bottom:10px;max-width:520px;margin-left:auto;margin-right:auto;box-shadow:0 2px 8px rgba(60,52,137,.04);}
+.qbox .qtext{margin-bottom:8px;}
+.choices2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;max-width:520px;margin-left:auto;margin-right:auto;}
+.choice2{padding:12px 8px;border-radius:12px;border:2px solid var(--border);background:#fff;font-size:13px;cursor:pointer;color:var(--text);font-family:inherit;font-weight:700;text-align:center;line-height:1.5;transition:all .12s;}
+.choice2:hover{border-color:var(--primary);background:var(--primary-light);}
+.choice2.correct{border-color:var(--ok-border);background:var(--ok-bg);color:var(--ok);pointer-events:none;}
+.choice2.wrong{border-color:var(--ng-border);background:var(--ng-bg);color:var(--ng);pointer-events:none;}
+.choice2.disabled{pointer-events:none;opacity:.4;}
+
+.res-area{text-align:center;padding:24px 10px;max-width:520px;margin:0 auto;}
+.res-emoji{font-size:48px;margin-bottom:8px;}
+.res-score{font-size:36px;font-weight:700;color:var(--primary);margin-bottom:4px;}
+.res-msg{font-size:14px;color:var(--text2);margin-bottom:16px;}
+.rgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
+.sbox{background:var(--border);border-radius:12px;padding:10px 6px;}
+.sval{font-size:20px;font-weight:700;color:var(--text);}
+.skey{font-size:11px;color:var(--text2);margin-top:2px;}
+.wlist{text-align:left;border:2px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:16px;max-height:180px;overflow-y:auto;}
+.witem{padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.witem:last-child{border-bottom:none;}
+.wq{color:var(--text2);margin-bottom:3px;}
+.wa{color:var(--primary);font-weight:700;}
+.rbtn{padding:11px 26px;border-radius:12px;background:var(--primary);border:none;color:#fff;font-size:14px;font-family:inherit;cursor:pointer;font-weight:700;margin:3px;}
+.rbtn2{padding:11px 26px;border-radius:12px;border:2px solid var(--border);background:#fff;font-size:14px;font-family:inherit;cursor:pointer;font-weight:700;margin:3px;color:var(--text);}
+</style>
+</head>
+<body>
+<h1>🎯 特訓クイズ</h1>
+<p class="subtitle">3富 成之助　4科目まとめて覚えよう！</p>
+
+<div class="top-tabs">
+  <button class="ttab on" onclick="switchTop('cards',this)">📚 覚えるカード</button>
+  <button class="ttab" onclick="switchTop('learn',this)">📖 漢字の成り立ち</button>
+  <button class="ttab" onclick="switchTop('quiz',this)">⚡ タイムアタック</button>
+</div>
+
+<!-- 覚えるカード -->
+<div id="cards" class="screen active">
+  <div class="sub-tabs">
+    <button class="stab on" onclick="setSubj('all',this)">全科目</button>
+    <button class="stab" onclick="setSubj('science',this)">🔬理科</button>
+    <button class="stab" onclick="setSubj('social',this)">🗾社会</button>
+    <button class="stab" onclick="setSubj('math',this)">🔢算数</button>
+    <button class="stab" onclick="setSubj('japanese',this)">✏️国語</button>
+  </div>
+  <div class="ctr" id="ctr">1/1</div>
+  <div class="pbar-wrap"><div class="pbar"><div class="pfill" id="cpfill" style="width:0%"></div></div></div>
+  <div class="card-wrap" id="cardwrap">
+    <div class="card" id="thecard">
+      <div class="cfront">
+        <div class="sbadge" id="cbadge">-</div>
+        <div class="qlabel">問題</div>
+        <div class="qtext" id="cqtext">-</div>
+        <div class="mapa" id="cmapf"></div>
+        <div class="taphint" id="ctaphint">👆 タップして答えを見る</div>
+      </div>
+      <div class="cback" id="cback">
+        <div class="alabel">答え</div>
+        <div class="atext" id="catext">-</div>
+        <div class="mapa" id="cmapb"></div>
+        <div class="hintbox" id="chint"></div>
+        <div class="cautbox" id="ccaut" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+  <div id="illust-wrap" style="display:none;">
+    <div class="img-choices" id="illust-choices"></div>
+    <div class="fb" id="illust-fb" style="margin-bottom:6px;"></div>
+    <div class="explainb" id="illust-explain"></div>
+  </div>
+  <div class="btns jrow" id="jrow">
+    <button class="btn btn-ng" onclick="judge(false)">😓 もう一度</button>
+    <button class="btn btn-ok" onclick="judge(true)">✅ わかった！</button>
+  </div>
+  <div class="btns">
+    <button class="btn" onclick="cprev()">← 前へ</button>
+    <button class="btn" onclick="cshuffle()">🔀 シャッフル</button>
+    <button class="btn" onclick="cnext()">次へ →</button>
+  </div>
+  <div class="complete" id="ccomplete">
+    <div style="font-size:48px;margin-bottom:10px;">⭐</div>
+    <div style="font-size:22px;font-weight:700;margin-bottom:6px;">全部チェックした！</div>
+    <div style="font-size:14px;color:var(--text2);margin-bottom:18px;" id="cscmsg"></div>
+    <button class="btn startbtn" onclick="crestart()" style="margin-bottom:16px;">もう一度チャレンジ</button>
+    <div class="note-sec">
+      <div class="note-t">📝 国語・読解メモ</div>
+      <div class="note-i">問一ア（5字）：<span class="note-a">おかあさん</span>　イ（6字）：<span class="note-a">チラシくばり</span></div>
+      <div class="note-i">問五：<span class="note-a">ちかのことをからかうため。</span></div>
+      <div class="note-i">問七：<span class="note-a">ウ（さわぐ子たちに注意をうながし、ちかを元気づけたい）</span></div>
+      <div class="note-i">問八：<span class="note-a">イ（弁当屋のことになかなか胸をはれず、そっとしておいてほしい）</span></div>
+      <div class="note-i">問九（はじめの5字）：<span class="note-a">いつのまに</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 成り立ち学習 -->
+<div id="learn" class="screen">
+  <div id="typelist">
+    <div style="font-size:13px;color:var(--text2);text-align:center;margin-bottom:12px;">4種類の漢字の成り立ち — タップして詳しく見よう</div>
+    <div class="type-grid">
+      <div class="tcard" onclick="showDet(0)"><div class="tnum" style="background:#EEEDFE;color:#3C3489;">①</div><div class="tname">象形文字</div><div class="tshort">物の形をそのまま絵にした字</div></div>
+      <div class="tcard" onclick="showDet(1)"><div class="tnum" style="background:#E1F5EE;color:#085041;">②</div><div class="tname">指事文字</div><div class="tshort">記号や点・線で意味を表した字</div></div>
+      <div class="tcard" onclick="showDet(2)"><div class="tnum" style="background:#FAEEDA;color:#633806;">③</div><div class="tname">会意文字</div><div class="tshort">意味のある字を組み合わせた字</div></div>
+      <div class="tcard" onclick="showDet(3)"><div class="tnum" style="background:#FAECE7;color:#712B13;">④</div><div class="tname">形声文字</div><div class="tshort">意味＋音を表す部分を合わせた字</div></div>
+    </div>
+    <div style="text-align:center;margin-top:10px;">
+      <button class="startbtn" onclick="switchTop('quiz',document.querySelectorAll('.ttab')[2])">クイズに挑戦する →</button>
+    </div>
+  </div>
+  <div id="detview" style="display:none;max-width:520px;margin:0 auto;">
+    <button class="backbtn" onclick="document.getElementById('typelist').style.display='';document.getElementById('detview').style.display='none';">← 一覧に戻る</button>
+    <div class="detsec">
+      <div class="dettitle" id="dtitle">-</div>
+      <div class="detsub" id="dsub">-</div>
+      <div class="mapa" id="dillust"></div>
+      <div style="font-size:12px;color:var(--text2);margin-top:8px;margin-bottom:4px;">代表的な漢字</div>
+      <div class="exrow" id="dex"></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;">
+      <button class="btn" onclick="navDet(-1)">← 前</button>
+      <button class="btn" onclick="navDet(1)">次 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- タイムアタック -->
+<div id="quiz" class="screen">
+  <div id="qstart" style="max-width:520px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px;">⚡ タイムアタッククイズ</div>
+      <div style="font-size:12px;color:var(--text2);">全科目まとめて特訓！</div>
+    </div>
+    <div class="mode-grid">
+      <div class="mcard sel" onclick="selMode(this,20)"><div class="mlabel">🔥 ノーマル</div><div class="mdesc">1問20秒</div></div>
+      <div class="mcard" onclick="selMode(this,10)"><div class="mlabel">⚡ 超速</div><div class="mdesc">1問10秒</div></div>
+      <div class="mcard" onclick="selMode(this,30)"><div class="mlabel">😌 ゆっくり</div><div class="mdesc">1問30秒</div></div>
+      <div class="mcard" onclick="selMode(this,0)"><div class="mlabel">♾️ 制限なし</div><div class="mdesc">じっくり考える</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--text2);text-align:center;margin-bottom:6px;">科目を絞る</div>
+    <div class="sf-row">
+      <button class="sf on" onclick="selSf(this,'all')">全科目</button>
+      <button class="sf" onclick="selSf(this,'science')">🔬理科</button>
+      <button class="sf" onclick="selSf(this,'social')">🗾社会</button>
+      <button class="sf" onclick="selSf(this,'math')">🔢算数</button>
+      <button class="sf" onclick="selSf(this,'japanese')">✏️国語</button>
+      <button class="sf" onclick="selSf(this,'kanji')">🖊成り立ち</button>
+    </div>
+    <button class="startbtn" onclick="startQuiz()">スタート！</button>
+  </div>
+
+  <div id="qmain" style="display:none;">
+    <div class="qhdr">
+      <div class="tbox"><span style="font-size:12px;">⏱</span><span class="tnum2" id="tnum">20</span></div>
+      <span class="slive" id="slive">0点</span>
+      <span class="qcnt" id="qcnt">1/40</span>
+    </div>
+    <div class="pbar-wrap" style="margin-bottom:10px;"><div class="pbar"><div class="pfill" id="qpfill"></div></div></div>
+    <div style="display:inline-block;font-size:11px;padding:3px 10px;border-radius:10px;background:var(--border);color:var(--text2);margin-bottom:6px;font-weight:700;" id="qstag">-</div>
+    <div class="qbox">
+      <div class="qtext" id="qqtext">-</div>
+      <div class="mapa" id="qmap"></div>
+    </div>
+    <div class="choices2" id="qchoices"></div>
+    <div class="fb" id="qfb"></div>
+    <div class="explainb" id="qexplain"></div>
+  </div>
+
+  <div id="qresult" class="res-area" style="display:none;">
+    <div class="res-emoji" id="remoji">🎉</div>
+    <div class="res-score" id="rscore">0点</div>
+    <div class="res-msg" id="rmsg">-</div>
+    <div class="rgrid">
+      <div class="sbox"><div class="sval" id="rcor">0</div><div class="skey">正解</div></div>
+      <div class="sbox"><div class="sval" id="rwrong">0</div><div class="skey">不正解</div></div>
+      <div class="sbox"><div class="sval" id="rtime">0</div><div class="skey">タイムアウト</div></div>
+    </div>
+    <div id="wlist" class="wlist" style="display:none;">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px;">📝 間違えた問題</div>
+      <div id="witems"></div>
+    </div>
+    <button class="rbtn" onclick="restartQuiz()">もう一度！</button>
+    <button class="rbtn2" onclick="backToStart()">設定に戻る</button>
+  </div>
+</div>
+
+<script>
+const SI=`<svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px;display:block;margin:0 auto;"><rect x="20" y="5" width="85" height="80" rx="8" fill="#EEEDFE" stroke="#AFA9EC" stroke-width="1"/><text x="62" y="22" font-size="10" fill="#534AB7" text-anchor="middle">山の絵</text><path d="M62 72 L35 42 L62 22 L89 42 Z" fill="#7F77DD"/><text x="62" y="100" font-size="13" font-weight="500" fill="#3C3489" text-anchor="middle">山</text><rect x="118" y="5" width="85" height="80" rx="8" fill="#EEEDFE" stroke="#AFA9EC" stroke-width="1"/><text x="160" y="22" font-size="10" fill="#534AB7" text-anchor="middle">馬の絵</text><ellipse cx="160" cy="45" rx="22" ry="14" fill="#7F77DD"/><ellipse cx="180" cy="38" rx="11" ry="8" fill="#7F77DD"/><line x1="145" y1="57" x2="142" y2="75" stroke="#7F77DD" stroke-width="2.5"/><line x1="153" y1="59" x2="151" y2="77" stroke="#7F77DD" stroke-width="2.5"/><line x1="167" y1="59" x2="168" y2="77" stroke="#7F77DD" stroke-width="2.5"/><line x1="175" y1="57" x2="178" y2="75" stroke="#7F77DD" stroke-width="2.5"/><text x="160" y="100" font-size="13" font-weight="500" fill="#3C3489" text-anchor="middle">馬</text><rect x="216" y="5" width="65" height="80" rx="8" fill="#EEEDFE" stroke="#AFA9EC" stroke-width="1"/><text x="248" y="22" font-size="10" fill="#534AB7" text-anchor="middle">川の絵</text><line x1="232" y1="30" x2="232" y2="75" stroke="#7F77DD" stroke-width="3.5"/><line x1="248" y1="30" x2="248" y2="75" stroke="#7F77DD" stroke-width="3.5"/><line x1="264" y1="30" x2="264" y2="75" stroke="#7F77DD" stroke-width="3.5"/><text x="248" y="100" font-size="13" font-weight="500" fill="#3C3489" text-anchor="middle">川</text></svg>`;
+const SJ=`<svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px;display:block;margin:0 auto;"><rect x="10" y="5" width="85" height="80" rx="8" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="1"/><text x="52" y="22" font-size="10" fill="#0F6E56" text-anchor="middle">「上」のしくみ</text><line x1="25" y1="65" x2="79" y2="65" stroke="#1D9E75" stroke-width="2.5"/><circle cx="52" cy="42" r="7" fill="#1D9E75"/><text x="52" y="100" font-size="13" font-weight="500" fill="#085041" text-anchor="middle">上</text><rect x="108" y="5" width="85" height="80" rx="8" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="1"/><text x="150" y="22" font-size="10" fill="#0F6E56" text-anchor="middle">「下」のしくみ</text><line x1="125" y1="42" x2="175" y2="42" stroke="#1D9E75" stroke-width="2.5"/><circle cx="150" cy="65" r="7" fill="#1D9E75"/><text x="150" y="100" font-size="13" font-weight="500" fill="#085041" text-anchor="middle">下</text><rect x="206" y="5" width="85" height="80" rx="8" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="1"/><text x="248" y="22" font-size="10" fill="#0F6E56" text-anchor="middle">一・二・三</text><line x1="225" y1="40" x2="271" y2="40" stroke="#1D9E75" stroke-width="2.5"/><line x1="225" y1="55" x2="271" y2="55" stroke="#1D9E75" stroke-width="2.5"/><line x1="225" y1="70" x2="271" y2="70" stroke="#1D9E75" stroke-width="2.5"/><text x="248" y="100" font-size="13" font-weight="500" fill="#085041" text-anchor="middle">一・二・三</text></svg>`;
+const SK=`<svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px;display:block;margin:0 auto;"><rect x="10" y="5" width="130" height="80" rx="8" fill="#FAEEDA" stroke="#EF9F27" stroke-width="1"/><text x="75" y="22" font-size="10" fill="#854F0B" text-anchor="middle">「森」木＋木＋木</text><text x="45" y="68" font-size="22" fill="#BA7517" text-anchor="middle">木</text><text x="75" y="55" font-size="22" fill="#BA7517" text-anchor="middle">木</text><text x="105" y="68" font-size="22" fill="#BA7517" text-anchor="middle">木</text><text x="75" y="100" font-size="13" font-weight="500" fill="#633806" text-anchor="middle">森</text><rect x="155" y="5" width="130" height="80" rx="8" fill="#FAEEDA" stroke="#EF9F27" stroke-width="1"/><text x="220" y="22" font-size="10" fill="#854F0B" text-anchor="middle">「明」日＋月＝明るい</text><text x="192" y="60" font-size="22" fill="#BA7517" text-anchor="middle">日</text><text x="220" y="42" font-size="16" fill="#854F0B" text-anchor="middle">＋</text><text x="248" y="60" font-size="22" fill="#BA7517" text-anchor="middle">月</text><text x="220" y="100" font-size="13" font-weight="500" fill="#633806" text-anchor="middle">明</text></svg>`;
+const SS=`<svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px;display:block;margin:0 auto;"><rect x="5" y="5" width="135" height="80" rx="8" fill="#FAECE7" stroke="#F0997B" stroke-width="1"/><text x="72" y="22" font-size="10" fill="#993C1D" text-anchor="middle">「草」のしくみ</text><rect x="15" y="30" width="50" height="38" rx="5" fill="#F5C4B3" stroke="#D85A30" stroke-width="1"/><text x="40" y="47" font-size="10" fill="#712B13" text-anchor="middle">草かんむり</text><text x="40" y="62" font-size="10" fill="#993C1D" text-anchor="middle">意味：植物</text><rect x="78" y="30" width="50" height="38" rx="5" fill="#F5C4B3" stroke="#D85A30" stroke-width="1"/><text x="103" y="47" font-size="10" fill="#712B13" text-anchor="middle">早（ソウ）</text><text x="103" y="62" font-size="10" fill="#993C1D" text-anchor="middle">音：ソウ</text><text x="72" y="100" font-size="22" fill="#D85A30" text-anchor="middle">草</text><rect x="155" y="5" width="135" height="80" rx="8" fill="#FAECE7" stroke="#F0997B" stroke-width="1"/><text x="222" y="22" font-size="10" fill="#993C1D" text-anchor="middle">「語」のしくみ</text><rect x="165" y="30" width="50" height="38" rx="5" fill="#F5C4B3" stroke="#D85A30" stroke-width="1"/><text x="190" y="47" font-size="10" fill="#712B13" text-anchor="middle">言（ごんべん）</text><text x="190" y="62" font-size="10" fill="#993C1D" text-anchor="middle">意味：言葉</text><rect x="228" y="30" width="50" height="38" rx="5" fill="#F5C4B3" stroke="#D85A30" stroke-width="1"/><text x="253" y="47" font-size="10" fill="#712B13" text-anchor="middle">吾（ゴ）</text><text x="253" y="62" font-size="10" fill="#993C1D" text-anchor="middle">音：ゴ</text><text x="222" y="100" font-size="22" fill="#D85A30" text-anchor="middle">語</text></svg>`;
+const NL=`<svg viewBox="0 0 300 90" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px;display:block;margin:0 auto;"><text x="10" y="16" font-size="10" fill="#5566aa">数直線A（2〜3を10等分）</text><line x1="20" y1="45" x2="280" y2="45" stroke="#1a1a2e" stroke-width="1.5"/><line x1="20" y1="38" x2="20" y2="52" stroke="#1a1a2e" stroke-width="1.5"/><line x1="280" y1="38" x2="280" y2="52" stroke="#1a1a2e" stroke-width="1.5"/><text x="20" y="68" font-size="12" fill="#1a1a2e" text-anchor="middle" font-weight="500">2</text><text x="280" y="68" font-size="12" fill="#1a1a2e" text-anchor="middle" font-weight="500">3</text>${[1,2,3,4,5,6,7,8,9].map(i=>`<line x1="${20+i*26}" y1="40" x2="${20+i*26}" y2="50" stroke="#9aaabb" stroke-width="1"/>`).join('')}<line x1="150" y1="37" x2="150" y2="53" stroke="#D85A30" stroke-width="2"/><text x="150" y="70" font-size="12" fill="#D85A30" text-anchor="middle" font-weight="500">ア</text><text x="150" y="85" font-size="10" fill="#D85A30" text-anchor="middle">↑ いくつ？</text></svg>`;
+const NLA=`<svg viewBox="0 0 300 90" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px;display:block;margin:0 auto;"><text x="10" y="16" font-size="10" fill="#5566aa">2と3の間を10等分→1目盛り＝0.1</text><line x1="20" y1="45" x2="280" y2="45" stroke="#1a1a2e" stroke-width="1.5"/><line x1="20" y1="38" x2="20" y2="52" stroke="#1a1a2e" stroke-width="1.5"/><line x1="280" y1="38" x2="280" y2="52" stroke="#1a1a2e" stroke-width="1.5"/><text x="20" y="68" font-size="12" fill="#1a1a2e" text-anchor="middle" font-weight="500">2</text><text x="280" y="68" font-size="12" fill="#1a1a2e" text-anchor="middle" font-weight="500">3</text>${[1,2,3,4,5,6,7,8,9].map(i=>`<line x1="${20+i*26}" y1="40" x2="${20+i*26}" y2="50" stroke="#9aaabb" stroke-width="1"/>`).join('')}<line x1="150" y1="37" x2="150" y2="53" stroke="#1D9E75" stroke-width="2"/><text x="150" y="68" font-size="12" fill="#1D9E75" text-anchor="middle" font-weight="500">2.5</text></svg>`;
+
+function makeSatsumaIMO(){
+  const A=`<svg viewBox="0 0 110 120" xmlns="http://www.w3.org/2000/svg" width="100%"><ellipse cx="55" cy="76" rx="34" ry="20" fill="#C0DD97" stroke="#639922" stroke-width="1.5"/><text x="55" y="80" font-size="9" fill="#3B6D11" text-anchor="middle" font-weight="500">種いも</text><circle cx="22" cy="76" r="3.5" fill="#854F0B"/><text x="6" y="70" font-size="7" fill="#633806" text-anchor="middle">くき</text><text x="6" y="79" font-size="7" fill="#633806" text-anchor="middle">側</text><line x1="25" y1="58" x2="21" y2="22" stroke="#1D9E75" stroke-width="1.8"/><ellipse cx="17" cy="16" rx="6" ry="4" fill="#5DCAA5" stroke="#1D9E75" stroke-width="1" transform="rotate(-20,17,16)"/><ellipse cx="25" cy="12" rx="5" ry="3.5" fill="#5DCAA5" stroke="#1D9E75" stroke-width="1"/><text x="20" y="7" font-size="8" fill="#085041" text-anchor="middle" font-weight="500">芽↑</text><line x1="72" y1="94" x2="70" y2="108" stroke="#BA7517" stroke-width="1.5"/><line x1="80" y1="92" x2="84" y2="107" stroke="#BA7517" stroke-width="1.5"/><line x1="63" y1="95" x2="59" y2="110" stroke="#BA7517" stroke-width="1.5"/><text x="72" y="118" font-size="8" fill="#633806" text-anchor="middle" font-weight="500">根↓</text></svg>`;
+  const I=`<svg viewBox="0 0 110 120" xmlns="http://www.w3.org/2000/svg" width="100%"><ellipse cx="55" cy="54" rx="34" ry="20" fill="#C0DD97" stroke="#639922" stroke-width="1.5"/><text x="55" y="58" font-size="9" fill="#3B6D11" text-anchor="middle" font-weight="500">種いも</text><circle cx="22" cy="54" r="3.5" fill="#854F0B"/><text x="6" y="48" font-size="7" fill="#633806" text-anchor="middle">くき</text><text x="6" y="57" font-size="7" fill="#633806" text-anchor="middle">側</text><line x1="72" y1="36" x2="70" y2="18" stroke="#BA7517" stroke-width="1.5"/><line x1="80" y1="38" x2="85" y2="20" stroke="#BA7517" stroke-width="1.5"/><text x="76" y="11" font-size="8" fill="#633806" text-anchor="middle">根↑?</text><line x1="25" y1="72" x2="21" y2="100" stroke="#1D9E75" stroke-width="1.8"/><ellipse cx="17" cy="106" rx="6" ry="4" fill="#5DCAA5" stroke="#1D9E75" stroke-width="1" transform="rotate(20,17,106)"/><text x="20" y="117" font-size="8" fill="#085041" text-anchor="middle">芽↓?</text></svg>`;
+  const U=`<svg viewBox="0 0 110 120" xmlns="http://www.w3.org/2000/svg" width="100%"><ellipse cx="55" cy="76" rx="34" ry="20" fill="#C0DD97" stroke="#639922" stroke-width="1.5"/><text x="55" y="80" font-size="9" fill="#3B6D11" text-anchor="middle" font-weight="500">種いも</text><circle cx="22" cy="76" r="3.5" fill="#854F0B"/><text x="6" y="70" font-size="7" fill="#633806" text-anchor="middle">くき</text><text x="6" y="79" font-size="7" fill="#633806" text-anchor="middle">側</text><line x1="25" y1="58" x2="21" y2="25" stroke="#1D9E75" stroke-width="1.8"/><ellipse cx="17" cy="19" rx="6" ry="4" fill="#5DCAA5" stroke="#1D9E75" stroke-width="1"/><text x="20" y="12" font-size="8" fill="#085041" text-anchor="middle">芽↑</text><line x1="78" y1="58" x2="80" y2="22" stroke="#BA7517" stroke-width="1.5"/><line x1="87" y1="60" x2="92" y2="25" stroke="#BA7517" stroke-width="1.5"/><text x="86" y="14" font-size="8" fill="#633806" text-anchor="middle">根↑?</text></svg>`;
+  const E=`<svg viewBox="0 0 110 120" xmlns="http://www.w3.org/2000/svg" width="100%"><ellipse cx="55" cy="44" rx="34" ry="20" fill="#C0DD97" stroke="#639922" stroke-width="1.5"/><text x="55" y="48" font-size="9" fill="#3B6D11" text-anchor="middle" font-weight="500">種いも</text><circle cx="22" cy="44" r="3.5" fill="#854F0B"/><text x="6" y="38" font-size="7" fill="#633806" text-anchor="middle">くき</text><text x="6" y="47" font-size="7" fill="#633806" text-anchor="middle">側</text><line x1="25" y1="62" x2="21" y2="90" stroke="#1D9E75" stroke-width="1.8"/><ellipse cx="17" cy="96" rx="6" ry="4" fill="#5DCAA5" stroke="#1D9E75" stroke-width="1" transform="rotate(20,17,96)"/><text x="20" y="110" font-size="8" fill="#085041" text-anchor="middle">芽↓?</text><line x1="72" y1="62" x2="70" y2="90" stroke="#BA7517" stroke-width="1.5"/><line x1="80" y1="60" x2="84" y2="89" stroke="#BA7517" stroke-width="1.5"/><text x="76" y="106" font-size="8" fill="#633806" text-anchor="middle">根↓?</text></svg>`;
+  return [{svg:A,correct:true,label:'ア'},{svg:I,correct:false,label:'イ'},{svg:U,correct:false,label:'ウ'},{svg:E,correct:false,label:'エ'}];
+}
+
+const allCards=[
+  {s:'japanese',q:'「きょうかん」を漢字で書こう\n（ともに感じること）',a:'共感',mf:'',mb:'',hint:'「共」＝ともに・いっしょに\n「協」（協力）とまちがえやすい！',caut:'⚠️ 「協感」はまちがい！「共感」が正しい'},
+  {s:'japanese',q:'「くんれん」を漢字で書こう',a:'訓練',mf:'',mb:'',hint:'訓（おしえる）＋練（きたえる）',caut:''},
+  {s:'japanese',q:'「ちょっけい」を漢字で書こう',a:'直径',mf:'',mb:'',hint:'「径」の左側は「彳（ぎょうにんべん）」\n棒が2本！亻（にんべん・1本）ではない',caut:'⚠️ 「径」の左は彳（棒2本）。亻（棒1本）はまちがい！'},
+  {s:'japanese',q:'「ふうけい」を漢字で書こう',a:'風景',mf:'',mb:'',hint:'風＋景',caut:''},
+  {s:'japanese',q:'「かんけつ」を漢字で書こう',a:'完結',mf:'',mb:'',hint:'完（おわる）＋結（むすぶ）',caut:'⚠️ 「完決」ではなく「完結」'},
+  {s:'japanese',q:'「いそしむ」の意味は？\n（例：勉強にいそしむ）',a:'一生懸命励む',mf:'',mb:'',hint:'「勤しむ」と書く。熱心に取り組むこと。',caut:''},
+  {s:'japanese',q:'「ねぎらう」の意味は？\n（例：長年の苦労をねぎらう）',a:'目下の者に感謝の言葉などをかける',mf:'',mb:'',hint:'「労う」と書く。苦労した人をいたわること。',caut:''},
+  {s:'japanese',q:'「草」はどの成り立ちの漢字？\n①象形 ②指事 ③会意 ④形声',a:'④形声文字',mf:'',mb:SS,hint:'草かんむり（意味：植物）＋早（ソウという音）',caut:''},
+  {s:'japanese',q:'「森」はどの成り立ちの漢字？\n①象形 ②指事 ③会意 ④形声',a:'③会意文字',mf:'',mb:SK,hint:'木＋木＋木＝森（木がたくさん）',caut:''},
+  {s:'japanese',q:'「下」はどの成り立ちの漢字？\n①象形 ②指事 ③会意 ④形声',a:'②指事文字',mf:'',mb:SJ,hint:'線の下に点をつけて「下」を表した。「上」も同じ。',caut:''},
+  {s:'japanese',q:'「馬」はどの成り立ちの漢字？\n①象形 ②指事 ③会意 ④形声',a:'①象形文字',mf:'',mb:SI,hint:'馬の姿をかたどった字。山・川・日・月も象形文字。',caut:''},
+  {s:'japanese',q:'「秋」の部首は？\nア：にんべん　イ：てへん\nウ：のぎへん　エ：しめすへん',a:'ウ：のぎへん（禾）',mf:'',mb:'',hint:'禾（のぎへん）＝稲・穀物に関係する字',caut:''},
+  {s:'japanese',q:'「社」の部首は？\nア：にんべん　イ：のぎへん\nウ：うかんむり　エ：しめすへん',a:'エ：しめすへん（礻）',mf:'',mb:'',hint:'しめすへん（礻）＝神・祭事に関係する字。神社の「社」！',caut:''},
+  {s:'math',q:'3.4L は何mL？',a:'3400mL',mf:'',mb:'',hint:'1L＝1000mL\n3.4×1000＝3400mL',caut:'⚠️ 340mLはまちがい！×1000を忘れずに'},
+  {s:'math',q:'1/10が4個集まった数を\n小数で表すと？',a:'0.4',mf:'',mb:'',hint:'4÷10＝0.4',caut:'⚠️ 分数のまま書かない！'},
+  {s:'math',q:'1/100が18個集まった数を\n小数で表すと？',a:'0.18',mf:'',mb:'',hint:'18÷100＝0.18',caut:'⚠️ 分数のまま書かない！'},
+  {s:'math',q:'下の数直線でアの値はいくつ？',a:'2.5',mf:NL,mb:NLA,hint:'2と3の間を10等分→1目盛り＝0.1\nアは5目盛り目→2.5',caut:'⚠️ まず何等分かを数えてから！'},
+  {s:'math',q:'砂糖1800gの1/3を午前に使い、\n午後に750g使った。残りは何g？',a:'450g',mf:'',mb:'',hint:'午前：1800×1/3＝600g\n午後：750g\n残り：1800－600－750＝450g',caut:'⚠️ 2回引くこと！300gはまちがい'},
+  {s:'science',q:'春に外国から運ばれて日本でふえた植物は？',a:'シロツメクサ',mf:'',mb:'',hint:'クローバー。ハハコグサ・ナズナは在来植物。',caut:''},
+  {s:'science',q:'春に南から渡ってきて日本で産卵する渡り鳥は？',a:'ツバメ',mf:'',mb:'',hint:'春に来て卵を産み、秋に南へ帰る。',caut:''},
+  {s:'science',q:'サツマイモの種いもから\n芽と根が出るようすとして正しいのは？',a:'ア（芽が上＝くき側、根が下）',mf:'',mb:'',hint:'芽はくきについていた方（頭側）から上へ伸びる。\n根は反対側（下）から伸びる。',caut:'',isIllust:true},
+  {s:'science',q:'ソメイヨシノで花になる芽はどちら？\n（丸い芽／細長い芽）',a:'丸くふっくらした芽（花芽）',mf:'',mb:'',hint:'丸い芽＝花芽、細長い芽＝葉芽',caut:''},
+  {s:'science',q:'桜の花と葉はどちらが先に出る？',a:'花が先、葉が後',mf:'',mb:'',hint:'満開のあとに緑の葉が出てくる。',caut:''},
+  {s:'science',q:'春に東京で花がさいていない植物は？\n（スイセン・ヒマワリ・チューリップ）',a:'ヒマワリ（夏の花）',mf:'',mb:'',hint:'スイセン・チューリップ→春、ヒマワリ→夏',caut:''},
+  {s:'science',q:'成虫で冬を越して春に活動する昆虫は？\n（アブラゼミ・カマキリ・ナナホシテントウ）',a:'ナナホシテントウ',mf:'',mb:'',hint:'カマキリ→卵、アブラゼミ→幼虫で越冬\nナナホシテントウ→成虫のまま越冬',caut:''},
+  {s:'science',q:'太陽が真南にくることを何という？',a:'南中（なんちゅう）',mf:'',mb:'',hint:'南中時刻は東ほど早く、西ほど遅い。',caut:''},
+  {s:'science',q:'南中時刻が早いのは東・西どちらの地方？',a:'東の地方のほうが早い',mf:'',mb:'',hint:'太陽は東→南→西と動く。東に先に来る。',caut:''},
+  {s:'science',q:'棒の影が最も長くなるのは\n太陽の高度が高いとき・低いとき？',a:'太陽の高度が低いとき',mf:'',mb:'',hint:'高度が低い→影が長い\n高度が高い（正午ごろ）→影が短い',caut:''},
+  {s:'social',q:'長崎県と陸続きで接している県は？',a:'佐賀県',mf:'',mb:'',hint:'長崎県は島が多く、陸続きの隣県は佐賀県のみ。',caut:''},
+  {s:'social',q:'「博多」という地域があるのは何県の何市？',a:'福岡県・福岡市',mf:'',mb:'',hint:'博多は福岡市内の地域名。県庁所在地も福岡市。',caut:''},
+  {s:'social',q:'鹿児島県にある2つの半島は？',a:'薩摩半島と大隅半島',mf:'',mb:'',hint:'間に錦江湾がある。桜島・知覧でも有名。',caut:''},
+  {s:'social',q:'島根県の県庁所在地は？（県名と異なる！）',a:'松江市',mf:'',mb:'',hint:'「島根市」という市は存在しない！\n県庁所在地は「松江市」。',caut:'⚠️ 「島根市」はまちがい！「松江市」が正しい'},
+  {s:'social',q:'愛媛県の県庁所在地は？（県名と異なる！）',a:'松山市',mf:'',mb:'',hint:'みかん・道後温泉で有名な愛媛県。\n県庁所在地は「松山市」。',caut:''},
+  {s:'social',q:'四国地方で全国最も面積が小さい都道府県は？',a:'香川県',mf:'',mb:'',hint:'うどんで有名。全国最小面積。\n県庁所在地は高松市。',caut:''},
+  {s:'social',q:'茨城県の県庁所在地は？',a:'水戸市',mf:'',mb:'',hint:'偕楽園・納豆で有名。\n県庁所在地は水戸市。',caut:''},
+  {s:'social',q:'栃木県の県庁所在地は？',a:'宇都宮市',mf:'',mb:'',hint:'日光東照宮・餃子で有名。\n県庁所在地は宇都宮市。',caut:''},
+  {s:'social',q:'琵琶湖がある府県は何県？その県庁所在地は？',a:'滋賀県・県庁所在地は大津市',mf:'',mb:'',hint:'日本最大の湖・琵琶湖は滋賀県にある。\n北陸の米を船で運んだ水路として使われた。',caut:''},
+  {s:'social',q:'三重県の県庁所在地は？（全国最短の地名！）',a:'津市',mf:'',mb:'',hint:'伊勢神宮がある三重県。\n県庁所在地の「津市」は漢字1文字で全国最短。',caut:''},
+  {s:'social',q:'果樹園（∨∨）の地図記号の土地で\nできないものは？\n（りんご・みかん・きゅうり・ぶどう）',a:'きゅうり',mf:'',mb:'',hint:'果樹園＝木になる果物（りんご・みかん・ぶどう）。\nきゅうりは畑作物なので果樹園ではできない。',caut:''},
+  {s:'social',q:'縦線2本（‖）の地図記号は何を表す？\n（茶畑・荒れ地・田）',a:'田',mf:'',mb:'',hint:'田→縦線2本（‖）\n茶畑→×が並ぶマーク\n荒れ地→草のようなマーク',caut:''},
+];
+
+const DETAILS=[
+  {title:'①象形文字（しょうけいもじ）',sub:'物の形をそのまま絵にして作った字。山・川・日・月・馬など目に見えるものが多い。絵が少しずつ変化して今の漢字になった。',illust:SI,ex:['山','川','日','月','馬','魚','木','火','水'],bg:'#EEEDFE',col:'#3C3489'},
+  {title:'②指事文字（しじもじ）',sub:'目に見えない「上・下・一・二・三」などを点や線などの記号で表した字。数が少なく、日常でよく使う基本的な字が多い。',illust:SJ,ex:['上','下','一','二','三','中','本'],bg:'#E1F5EE',col:'#085041'},
+  {title:'③会意文字（かいいもじ）',sub:'意味を持つ字を2つ以上組み合わせて、新しい意味を作った字。「木＋木＋木＝森」「日＋月＝明（明るい）」のように意味を合わせた。',illust:SK,ex:['森','林','明','休','男','信','岩'],bg:'#FAEEDA',col:'#633806'},
+  {title:'④形声文字（けいせいもじ）',sub:'意味を表す部分（部首）と音を表す部分を組み合わせた字。漢字全体の約80%がこの種類！「草」は草かんむり（意味）＋早（ソウという音）。',illust:SS,ex:['草','語','海','晴','池','銅','記','話'],bg:'#FAECE7',col:'#712B13'},
+];
+
+let curDet=0;
+function showDet(i){
+  curDet=i;const d=DETAILS[i];
+  document.getElementById('dtitle').textContent=d.title;
+  document.getElementById('dsub').textContent=d.sub;
+  document.getElementById('dillust').innerHTML=d.illust;
+  document.getElementById('dex').innerHTML=d.ex.map(e=>`<span class="echip" style="background:${d.bg};color:${d.col};">${e}</span>`).join('');
+  document.getElementById('typelist').style.display='none';
+  document.getElementById('detview').style.display='block';
+}
+function navDet(dir){curDet=(curDet+dir+4)%4;showDet(curDet);}
+
+let cdeck=[...allCards],cidx=0,cflipped=false,cok=new Set(),csub='all',illustDone=false;
+
+function setSubj(s,el){
+  csub=s;
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('on'));el.classList.add('on');
+  cdeck=s==='all'?[...allCards]:allCards.filter(c=>c.s===s);
+  cidx=0;cok=new Set();
+  document.getElementById('ccomplete').style.display='none';
+  document.getElementById('cardwrap').style.display='block';
+  document.getElementById('ctr').style.display='block';
+  document.querySelector('.pbar-wrap').style.display='block';
+  showCard();
+}
+
+function showCard(){
+  if(!cdeck.length)return;
+  cflipped=false;illustDone=false;
+  document.getElementById('cback').classList.remove('show');
+  document.getElementById('jrow').classList.remove('show');
+  document.getElementById('illust-wrap').style.display='none';
+  document.getElementById('illust-choices').innerHTML='';
+  document.getElementById('illust-fb').textContent='';
+  document.getElementById('illust-fb').className='fb';
+  document.getElementById('illust-explain').textContent='';
+  document.getElementById('illust-explain').classList.remove('show');
+  const c=cdeck[cidx];
+  const sl={science:'🔬 理科',social:'🗾 社会',math:'🔢 算数',japanese:'✏️ 国語'};
+  document.getElementById('cbadge').textContent=sl[c.s]||c.s;
+  document.getElementById('cqtext').textContent=c.q;
+  document.getElementById('cmapf').innerHTML=c.mf||'';
+  document.getElementById('catext').textContent=c.a;
+  document.getElementById('cmapb').innerHTML=c.mb||'';
+  document.getElementById('chint').textContent=c.hint||'';
+  const cc=document.getElementById('ccaut');
+  if(c.caut){cc.textContent=c.caut;cc.style.display='block';}else{cc.style.display='none';}
+  if(c.isIllust){
+    document.getElementById('ctaphint').textContent='👇 下の絵から正しいものを選ぼう！';
+    document.getElementById('illust-wrap').style.display='block';
+    buildIllustChoices();
+  }else{
+    document.getElementById('ctaphint').textContent='👆 タップして答えを見る';
+  }
+  document.getElementById('ctr').textContent=(cidx+1)+' / '+cdeck.length;
+  document.getElementById('cpfill').style.width=Math.round(cok.size/cdeck.length*100)+'%';
+}
+
+function buildIllustChoices(){
+  const items=makeSatsumaIMO().sort(()=>Math.random()-0.5);
+  const area=document.getElementById('illust-choices');area.innerHTML='';
+  items.forEach(item=>{
+    const div=document.createElement('div');div.className='ichoice';
+    div.innerHTML=item.svg+`<div class="iclabel">${item.label}</div>`;
+    div.onclick=()=>onIllustChoice(div,item.correct,area);
+    area.appendChild(div);
+  });
+}
+
+function onIllustChoice(el,correct,area){
+  if(illustDone)return;illustDone=true;
+  Array.from(area.children).forEach(d=>d.classList.add('ic-disabled'));
+  el.classList.remove('ic-disabled');el.classList.add(correct?'ic-correct':'ic-wrong');
+  if(!correct){
+    Array.from(area.children).forEach(d=>{
+      if(d!==el&&d.querySelector('.iclabel')&&d.querySelector('.iclabel').textContent==='ア'){
+        d.classList.remove('ic-disabled');d.classList.add('ic-correct');
+      }
+    });
+  }
+  document.getElementById('illust-fb').textContent=correct?'⭕ 正解！芽は上（くき側）、根は下！':'❌ まちがい！アが正解。芽は上、根は下に出る。';
+  document.getElementById('illust-fb').className='fb '+(correct?'ok':'ng');
+  document.getElementById('illust-explain').textContent='芽はくきについていた方（頭側）から上へ伸びる。根は反対側（下）から伸びる。';
+  document.getElementById('illust-explain').classList.add('show');
+  document.getElementById('jrow').classList.add('show');
+}
+
+document.getElementById('thecard').onclick=function(){
+  const c=cdeck[cidx];if(c&&c.isIllust)return;
+  if(!cflipped){cflipped=true;document.getElementById('cback').classList.add('show');document.getElementById('jrow').classList.add('show');}
+};
+
+function judge(ok){if(ok)cok.add(cidx);cnext();}
+function cnext(){if(cidx<cdeck.length-1){cidx++;showCard();}else{showComplete2();}}
+function cprev(){if(cidx>0){cidx--;showCard();}}
+function cshuffle(){
+  for(let i=cdeck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cdeck[i],cdeck[j]]=[cdeck[j],cdeck[i]];}
+  cidx=0;cok=new Set();showCard();
+}
+function showComplete2(){
+  document.getElementById('cardwrap').style.display='none';
+  document.getElementById('jrow').classList.remove('show');
+  document.getElementById('illust-wrap').style.display='none';
+  document.getElementById('ctr').style.display='none';
+  document.querySelector('.pbar-wrap').style.display='none';
+  document.getElementById('ccomplete').style.display='block';
+  document.getElementById('cscmsg').textContent=cdeck.length+'枚中'+cok.size+'枚わかった！（'+Math.round(cok.size/cdeck.length*100)+'%）';
+}
+function crestart(){
+  cidx=0;cok=new Set();cdeck=csub==='all'?[...allCards]:allCards.filter(c=>c.s===csub);
+  document.getElementById('ccomplete').style.display='none';
+  document.getElementById('cardwrap').style.display='block';
+  document.getElementById('ctr').style.display='block';
+  document.querySelector('.pbar-wrap').style.display='block';
+  showCard();
+}
+
+const allQ=[
+  {s:'japanese',q:'「きょうかん」を漢字で書くと？',c:['協感','共惑','共感','供感'],a:2,ex:'「共」＝ともに。「協感」はまちがい！'},
+  {s:'japanese',q:'「くんれん」を漢字で書くと？',c:['均練','勲練','訓錬','訓練'],a:3,ex:'訓（おしえる）＋練（きたえる）＝訓練'},
+  {s:'japanese',q:'「ちょっけい」の「径」の左側の部首は？',c:['亻にんべん（棒1本）','彡さんづくり','工','彳ぎょうにんべん（棒2本）'],a:3,ex:'「径」の左は彳（棒2本）。亻（棒1本）はまちがい！'},
+  {s:'japanese',q:'「ふうけい」を漢字で書くと？',c:['風影','封景','風鏡','風景'],a:3,ex:'風＋景＝風景'},
+  {s:'japanese',q:'「かんけつ」を漢字で書くと？',c:['完決','完欠','完傑','完結'],a:3,ex:'完＋結＝完結。「完決」はまちがい！'},
+  {s:'japanese',q:'「いそしむ」の意味は？',c:['逃れる','しばらく立っている','恥ずかしがる','一生懸命励む'],a:3,ex:'「勤しむ」と書く。熱心に取り組むこと。'},
+  {s:'japanese',q:'「ねぎらう」の意味は？',c:['一生懸命励む','逃れる','恥ずかしがる','目下の者に感謝の言葉をかける'],a:3,ex:'「労う」と書く。苦労した人をいたわること。'},
+  {s:'japanese',q:'「草」はどの成り立ちの漢字？',c:['象形文字','指事文字','会意文字','形声文字'],a:3,ex:'形声文字。草かんむり（意味）＋早（ソウという音）。'},
+  {s:'japanese',q:'「森」はどの成り立ちの漢字？',c:['象形文字','指事文字','会意文字','形声文字'],a:2,ex:'会意文字。木＋木＋木＝森。'},
+  {s:'japanese',q:'「下」はどの成り立ちの漢字？',c:['象形文字','指事文字','会意文字','形声文字'],a:1,ex:'指事文字。線の下に点をつけて「下」を表した。'},
+  {s:'japanese',q:'「馬」はどの成り立ちの漢字？',c:['象形文字','指事文字','会意文字','形声文字'],a:0,ex:'象形文字。馬の姿をかたどった字。'},
+  {s:'japanese',q:'「明」はどの成り立ちの漢字？（日＋月）',c:['象形文字','指事文字','会意文字','形声文字'],a:2,ex:'会意文字。日と月を組み合わせて「明るい」を表した。'},
+  {s:'japanese',q:'「秋」の部首は？',c:['にんべん','てへん','のぎへん','しめすへん'],a:2,ex:'のぎへん（禾）＝稲・穀物に関係する字。'},
+  {s:'japanese',q:'「社」の部首は？',c:['にんべん','のぎへん','うかんむり','しめすへん'],a:3,ex:'しめすへん（礻）＝神・祭事に関係する字。'},
+  {s:'math',q:'3.4L＝何mL？',c:['34mL','340mL','3400mL','34000mL'],a:2,ex:'1L＝1000mL。3.4×1000＝3400mL。'},
+  {s:'math',q:'1/10が4個集まった数（小数）',c:['0.04','4','40','0.4'],a:3,ex:'4÷10＝0.4。'},
+  {s:'math',q:'1/100が18個集まった数（小数）',c:['1.8','0.018','18','0.18'],a:3,ex:'18÷100＝0.18。'},
+  {s:'math',q:'数直線A（2〜3を10等分）でアの値は？',c:['2.3','2.7','2.9','2.5'],a:3,ex:'2と3の間を10等分→1目盛り＝0.1。5目盛り目→2.5。'},
+  {s:'math',q:'砂糖1800gの1/3を午前に使い\n午後に750g使った。残りは？',c:['300g','600g','750g','450g'],a:3,ex:'午前600g＋午後750g＝1350g。1800－1350＝450g。'},
+  {s:'science',q:'サツマイモの芽が出るのはどちら側？',c:['根のあった方（下側）','両側から均等に','くきについていた方（頭側）','中央から'],a:2,ex:'芽はくきのあった方（頭側）から上へ、根は反対側（下）から伸びる。'},
+  {s:'science',q:'春に外国から来てふえた植物は？',c:['ハハコグサ','ナズナ','アブラナ','シロツメクサ'],a:3,ex:'シロツメクサ（クローバー）は外来植物。他は在来植物。'},
+  {s:'science',q:'春に南から渡ってきて産卵する渡り鳥は？',c:['カラス','ハト','スズメ','ツバメ'],a:3,ex:'ツバメは春に飛来して卵を産み、秋に南へ帰る。'},
+  {s:'science',q:'ソメイヨシノで花になる芽は？',c:['細長い芽','どちらも同じ','丸くふっくらした芽','年による'],a:2,ex:'丸い芽＝花芽、細長い芽＝葉芽。'},
+  {s:'science',q:'桜の花と葉の順番は？',c:['葉が先・花が後','同時','年による','花が先・葉が後'],a:3,ex:'ソメイヨシノは花が先、葉が後。'},
+  {s:'science',q:'春に東京で咲いていない植物は？',c:['スイセン','チューリップ','ヒマワリ','アブラナ'],a:2,ex:'ヒマワリは夏の花。'},
+  {s:'science',q:'成虫で冬を越す昆虫は？',c:['アブラゼミ','カマキリ','モンシロチョウ','ナナホシテントウ'],a:3,ex:'ナナホシテントウは成虫で越冬。カマキリ→卵、アブラゼミ→幼虫。'},
+  {s:'science',q:'太陽が真南にくることを何という？',c:['南下','正中','南通','南中'],a:3,ex:'南中。南中時刻は東ほど早く西ほど遅い。'},
+  {s:'science',q:'南中時刻が早いのは東・西どちら？',c:['西の地方','同じ','北の地方','東の地方'],a:3,ex:'太陽は東から西へ動くため、東の地方が先に南中する。'},
+  {s:'science',q:'影が最も長くなるのはいつ？',c:['正午ちょうど','午後3時','太陽高度が最低のとき','日の出直後'],a:2,ex:'太陽の高度が低いほど影が長くなる。午前10時が最低。'},
+  {s:'social',q:'長崎県と陸続きで接している県は？',c:['大分県','熊本県','宮崎県','佐賀県'],a:3,ex:'長崎県は島が多く、陸続きの隣県は佐賀県のみ。'},
+  {s:'social',q:'博多という地域があるのは何市？',c:['長崎市','熊本市','鹿児島市','福岡市'],a:3,ex:'博多は福岡市内の地域名。県庁所在地も福岡市。'},
+  {s:'social',q:'鹿児島県にある2つの半島は？',c:['薩摩半島と大隅半島','伊豆半島と能登半島','島原半島と天草半島','紀伊半島と房総半島'],a:0,ex:'薩摩半島と大隅半島。間に錦江湾がある。'},
+  {s:'social',q:'島根県の県庁所在地は？',c:['鳥取市','島根市','松江市','津山市'],a:2,ex:'島根県の県庁所在地は松江市（県名と異なる！）。「島根市」はない。'},
+  {s:'social',q:'愛媛県の県庁所在地は？',c:['高松市','高知市','徳島市','松山市'],a:3,ex:'愛媛県の県庁所在地は松山市（県名と異なる！）。'},
+  {s:'social',q:'四国で全国最も面積が小さい県は？',c:['徳島県','高知県','愛媛県','香川県'],a:3,ex:'香川県は全国で最も面積が小さい。うどんで有名。'},
+  {s:'social',q:'茨城県の県庁所在地は？',c:['前橋市','宇都宮市','さいたま市','水戸市'],a:3,ex:'茨城県の県庁所在地は水戸市。偕楽園・納豆で有名。'},
+  {s:'social',q:'栃木県の県庁所在地は？',c:['前橋市','水戸市','高崎市','宇都宮市'],a:3,ex:'栃木県の県庁所在地は宇都宮市。日光東照宮・餃子で有名。'},
+  {s:'social',q:'琵琶湖がある県の県庁所在地は？',c:['京都市','津市','奈良市','大津市'],a:3,ex:'琵琶湖は滋賀県にある。県庁所在地は大津市。'},
+  {s:'social',q:'三重県の県庁所在地は？（全国最短の地名）',c:['松阪市','伊勢市','四日市','津市'],a:3,ex:'三重県の県庁所在地は津市。漢字1文字で全国最短。'},
+  {s:'social',q:'果樹園（∨∨）でできないものは？',c:['りんご','みかん','ぶどう','きゅうり'],a:3,ex:'きゅうりは畑作物。果樹園は木になる果物。'},
+  {s:'social',q:'縦線2本（‖）の地図記号は？',c:['茶畑','荒れ地','桑畑','田'],a:3,ex:'‖＝田。茶畑→×が並ぶ、荒れ地→草のようなマーク。'},
+  {s:'kanji',q:'象形文字とはどんな字？',c:['記号や点・線で意味を示した字','物の形をそのまま絵にした字','意味のある字を組み合わせた字','意味＋音を組み合わせた字'],a:1,ex:'山・川・日・月・馬など物の形が絵から変化して字になった。'},
+  {s:'kanji',q:'指事文字とはどんな字？',c:['物の形をそのまま絵にした字','意味のある字を組み合わせた字','記号や点・線で意味を示した字','意味＋音を組み合わせた字'],a:2,ex:'上・下・一・二・三など。目に見えないものを記号で表した。'},
+  {s:'kanji',q:'会意文字とはどんな字？',c:['記号や点・線で意味を示した字','物の形をそのまま絵にした字','意味＋音を組み合わせた字','意味のある字を組み合わせた字'],a:3,ex:'森（木×3）・明（日＋月）・休（人＋木）など。'},
+  {s:'kanji',q:'形声文字とはどんな字？',c:['物の形をそのまま絵にした字','記号や点・線で意味を示した字','意味のある字を組み合わせた字','意味（部首）＋音を組み合わせた字'],a:3,ex:'漢字の約80%！草・語・海・晴など。'},
+  {s:'kanji',q:'次のうち会意文字はどれ？',c:['川','一','語','明'],a:3,ex:'明（日＋月＝明るい）は会意文字。川→象形、一→指事、語→形声。'},
+  {s:'kanji',q:'次のうち形声文字はどれ？',c:['下','森','日','草'],a:3,ex:'草（草かんむり＋早）は形声文字。下→指事、森→会意、日→象形。'},
+  {s:'kanji',q:'漢字の約80%を占める種類は？',c:['象形文字','指事文字','会意文字','形声文字'],a:3,ex:'形声文字が約80%。意味＋音の組み合わせで多くの字を作れるから。'},
+];
+
+let tpq=20,qsub='all',curQ=0,qscore=0,cor=0,wrg=0,tout=0,tInt=null,tLeft=20,qanswered=false,wrongItems=[],shuffledQ=[];
+
+function selMode(el,t){document.querySelectorAll('.mcard').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');tpq=t;}
+function selSf(el,s){document.querySelectorAll('.sf').forEach(b=>b.classList.remove('on'));el.classList.add('on');qsub=s;}
+
+function startQuiz(){
+  const pool=qsub==='all'?allQ:allQ.filter(q=>q.s===qsub);
+  shuffledQ=[...pool].sort(()=>Math.random()-0.5);
+  curQ=0;qscore=0;cor=0;wrg=0;tout=0;wrongItems=[];
+  document.getElementById('qstart').style.display='none';
+  document.getElementById('qresult').style.display='none';
+  document.getElementById('qmain').style.display='block';
+  loadQ();
+}
+
+function loadQ(){
+  if(curQ>=shuffledQ.length){showResult();return;}
+  const q=shuffledQ[curQ];qanswered=false;
+  document.getElementById('qfb').textContent='';document.getElementById('qfb').className='fb';
+  document.getElementById('qexplain').textContent='';document.getElementById('qexplain').classList.remove('show');
+  const sl={science:'🔬理科',social:'🗾社会',math:'🔢算数',japanese:'✏️国語',kanji:'🖊成り立ち'};
+  document.getElementById('qstag').textContent=sl[q.s]||q.s;
+  document.getElementById('qqtext').textContent=q.q;
+  document.getElementById('qcnt').textContent=(curQ+1)+'/'+shuffledQ.length;
+  document.getElementById('slive').textContent=qscore+'点';
+  document.getElementById('qpfill').style.width=Math.round(curQ/shuffledQ.length*100)+'%';
+  const ch=document.getElementById('qchoices');ch.innerHTML='';
+  q.c.forEach((c,i)=>{const b=document.createElement('button');b.className='choice2';b.textContent=c;b.onclick=()=>answerQ(i);ch.appendChild(b);});
+  clearInterval(tInt);
+  if(tpq>0){tLeft=tpq;updT();tInt=setInterval(()=>{tLeft--;updT();if(tLeft<=0){clearInterval(tInt);onTO();}},1000);}
+  else{document.getElementById('tnum').textContent='∞';document.getElementById('tnum').className='tnum2';}
+}
+
+function updT(){const el=document.getElementById('tnum');el.textContent=tLeft;el.className='tnum2'+(tLeft<=5?' warn':'');}
+
+function answerQ(i){
+  if(qanswered)return;qanswered=true;clearInterval(tInt);
+  const q=shuffledQ[curQ];
+  document.querySelectorAll('.choice2').forEach((b,j)=>{if(j===q.a)b.classList.add('correct');else if(j===i)b.classList.add('wrong');else b.classList.add('disabled');});
+  if(i===q.a){const pts=tpq>0?Math.max(10,Math.round(tLeft/tpq*100)):100;qscore+=pts;cor++;document.getElementById('qfb').textContent='⭕ 正解！ ＋'+pts+'点';document.getElementById('qfb').className='fb ok';}
+  else{wrg++;wrongItems.push(q);document.getElementById('qfb').textContent='❌ まちがい！';document.getElementById('qfb').className='fb ng';}
+  document.getElementById('qexplain').textContent=q.ex||'';document.getElementById('qexplain').classList.add('show');
+  setTimeout(()=>{curQ++;loadQ();},2000);
+}
+
+function onTO(){
+  if(qanswered)return;qanswered=true;tout++;
+  const q=shuffledQ[curQ];wrongItems.push(q);
+  document.querySelectorAll('.choice2').forEach((b,i)=>{if(i===q.a)b.classList.add('correct');else b.classList.add('disabled');});
+  document.getElementById('qfb').textContent='⏱ 時間切れ！';document.getElementById('qfb').className='fb ng';
+  document.getElementById('qexplain').textContent=q.ex||'';document.getElementById('qexplain').classList.add('show');
+  setTimeout(()=>{curQ++;loadQ();},2000);
+}
+
+function showResult(){
+  document.getElementById('qmain').style.display='none';document.getElementById('qresult').style.display='block';
+  const total=shuffledQ.length,pct=Math.round(cor/total*100);
+  let emoji='😓',msg='もう一度チャレンジ！';
+  if(pct>=90){emoji='🏆';msg='完璧！本当にすごい！';}else if(pct>=70){emoji='🎉';msg='よくがんばった！';}else if(pct>=50){emoji='😊';msg='もう少し！';}
+  document.getElementById('remoji').textContent=emoji;
+  document.getElementById('rscore').textContent=qscore+'点';
+  document.getElementById('rmsg').textContent=pct+'%正解　'+msg;
+  document.getElementById('rcor').textContent=cor;
+  document.getElementById('rwrong').textContent=wrg;
+  document.getElementById('rtime').textContent=tout;
+  if(wrongItems.length>0){
+    document.getElementById('wlist').style.display='block';
+    document.getElementById('witems').innerHTML=wrongItems.map(w=>'<div class="witem"><div class="wq">Q: '+w.q.replace(/\n/g,' ')+'</div><div class="wa">A: '+w.c[w.a]+'</div></div>').join('');
+  }
+}
+
+function restartQuiz(){document.getElementById('qresult').style.display='none';startQuiz();}
+function backToStart(){document.getElementById('qresult').style.display='none';document.getElementById('qmain').style.display='none';document.getElementById('qstart').style.display='block';}
+
+function switchTop(id,el){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.ttab').forEach(t=>t.classList.remove('on'));el.classList.add('on');
+}
+
+showCard();
+</script>
+</body>
+</html>
