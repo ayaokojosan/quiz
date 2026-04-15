@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>漢字確認問題 第9回</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@400;700&family=Noto+Sans+JP:wght@300;400;700;900&display=swap');
+
+  :root {
+    --ink: #1a1a2e;
+    --paper: #fdf6e3;
+    --gold: #d4a017;
+    --blue: #1a5276;
+    --green: #1a7a4a;
+    --accent: #e74c3c;
+    --soft: #f5efe0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--paper);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(180,160,120,0.15) 39px, rgba(180,160,120,0.15) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(180,160,120,0.08) 39px, rgba(180,160,120,0.08) 40px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  h1 {
+    font-family: 'Kaisei Decol', serif;
+    font-size: clamp(1.2rem, 4vw, 1.8rem);
+    color: var(--ink);
+    text-align: center;
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 1;
+    letter-spacing: 0.1em;
+  }
+
+  .subtitle {
+    font-size: 0.75rem;
+    color: #666;
+    margin-bottom: 14px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mode-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mode-tab {
+    padding: 6px 14px;
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Noto Sans JP', sans-serif;
+    color: #666;
+  }
+  .mode-tab.active { background: var(--ink); color: white; border-color: var(--ink); }
+
+  .progress-bar {
+    width: 100%;
+    max-width: 560px;
+    height: 6px;
+    background: #ddd;
+    border-radius: 3px;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--accent));
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  .counter {
+    font-size: 0.78rem;
+    color: #888;
+    text-align: center;
+    margin-bottom: 14px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .card-container {
+    perspective: 1200px;
+    width: 100%;
+    max-width: 560px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .card {
+    width: 100%;
+    min-height: 400px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4,0,0.2,1);
+    cursor: pointer;
+  }
+  .card.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.07);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 24px;
+    min-height: 400px;
+  }
+
+  .card-front { background: white; border: 2px solid rgba(180,160,100,0.3); }
+  .card-back { background: linear-gradient(135deg, #fffef8, #fdf6e3); border: 2px solid var(--gold); transform: rotateY(180deg); }
+
+  .question-num { position: absolute; top: 14px; left: 18px; font-size: 0.72rem; color: #bbb; font-weight: 700; }
+  .tap-hint { position: absolute; bottom: 14px; right: 18px; font-size: 0.62rem; color: #ccc; }
+  .instruction { font-size: 0.67rem; color: #ccc; margin-bottom: 14px; letter-spacing: 0.04em; }
+
+  .sentence-wrap {
+    width: 100%;
+    text-align: center;
+    line-height: 2.4;
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+
+  .ul {
+    border-bottom: 2.5px solid var(--accent);
+    padding-bottom: 1px;
+    font-weight: 700;
+    color: #c0392b;
+  }
+
+  .reading-hint { font-size: 0.7rem; color: #bbb; margin-top: 4px; }
+
+  .kanji-big {
+    font-family: 'Kaisei Decol', serif;
+    font-size: clamp(3rem, 12vw, 5rem);
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 6px;
+    text-shadow: 2px 3px 0 rgba(180,160,100,0.3);
+  }
+
+  .reading-back { font-size: 0.88rem; color: var(--gold); font-weight: 700; margin-bottom: 8px; letter-spacing: 0.15em; }
+  .divider { width: 50px; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 6px auto 12px; }
+
+  .image-area {
+    width: 100%;
+    max-width: 300px;
+    background: var(--soft);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    text-align: center;
+    border: 1px solid rgba(180,160,100,0.2);
+  }
+
+  .emoji-scene { font-size: clamp(2rem, 8vw, 3rem); margin-bottom: 6px; line-height: 1.2; }
+  .memory-text { font-size: clamp(0.7rem, 2.2vw, 0.8rem); color: #555; line-height: 1.8; text-align: left; }
+  .memory-text strong { color: var(--accent); }
+  .stroke-hint { font-size: 0.67rem; color: #aaa; margin-top: 6px; }
+
+  .nav {
+    display: flex;
+    gap: 12px;
+    margin-top: 18px;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .nav-btn {
+    padding: 10px 22px;
+    border: 2px solid var(--ink);
+    background: white;
+    color: var(--ink);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.83rem;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover { background: var(--ink); color: white; transform: translateY(-1px); }
+  .nav-btn:active { transform: translateY(0); }
+  .nav-btn:disabled { opacity: 0.28; cursor: default; }
+  .nav-btn:disabled:hover { background: white; color: var(--ink); transform: none; }
+  .nav-btn.primary { background: var(--ink); color: white; }
+  .nav-btn.primary:hover { background: #2d2d4e; }
+
+  .quiz-input-area {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 10px; width: 100%; max-width: 260px; margin-top: 12px;
+  }
+
+  .quiz-input {
+    width: 100%; font-size: 1.4rem; text-align: center;
+    padding: 8px; border: 2px solid #ddd; border-radius: 8px;
+    font-family: 'Kaisei Decol', serif; outline: none; transition: border-color 0.2s;
+  }
+  .quiz-input:focus { border-color: var(--gold); }
+  .quiz-input.correct { border-color: var(--green); background: #f0fff4; }
+  .quiz-input.wrong { border-color: var(--accent); background: #fff5f5; }
+
+  .check-btn {
+    padding: 8px 28px; background: var(--blue); color: white;
+    border: none; border-radius: 8px; font-size: 0.83rem;
+    font-family: 'Noto Sans JP', sans-serif; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .check-btn:hover { background: #1a3a6e; transform: translateY(-1px); }
+
+  .result-msg { font-size: 0.83rem; font-weight: 700; min-height: 22px; text-align: center; }
+  .result-msg.ok { color: var(--green); }
+  .result-msg.ng { color: var(--accent); }
+
+  .complete-screen {
+    display: none; flex-direction: column; align-items: center;
+    gap: 12px; text-align: center; padding: 32px;
+    position: relative; z-index: 1; width: 100%; max-width: 560px;
+  }
+  .complete-screen.show { display: flex; }
+
+  .score-circle {
+    width: 100px; height: 100px; border-radius: 50%;
+    border: 4px solid var(--gold);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-family: 'Kaisei Decol', serif;
+  }
+  .score-num { font-size: 2rem; color: var(--ink); font-weight: 700; }
+  .score-label { font-size: 0.62rem; color: #888; }
+
+  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+  .card-container { animation: fadeIn 0.3s ease; }
+</style>
+</head>
+<body>
+
+<h1>📝 漢字確認問題 第9回</h1>
+<p class="subtitle">下線部を漢字に直しなさい（全40問）</p>
+
+<div class="mode-tabs">
+  <button class="mode-tab active" onclick="setMode('flash')">📚 フラッシュ</button>
+  <button class="mode-tab" onclick="setMode('quiz')">✏️ 書き取り</button>
+</div>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+<p class="counter" id="counter"></p>
+
+<div class="card-container">
+  <div class="card" id="card" onclick="flipCard()">
+    <div class="card-face card-front" id="front"></div>
+    <div class="card-face card-back" id="back"></div>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn" onclick="prev()" id="prevBtn" disabled>← 前</button>
+  <button class="nav-btn primary" onclick="next()" id="nextBtn">次 →</button>
+</div>
+
+<div class="complete-screen" id="complete">
+  <div style="font-size:3rem">🎉</div>
+  <h2 style="font-family:'Kaisei Decol',serif;font-size:1.4rem;color:var(--ink)">全問完了！</h2>
+  <div class="score-circle" id="scoreCircle">
+    <span class="score-num" id="scoreNum">-</span>
+    <span class="score-label">点 / 40</span>
+  </div>
+  <p style="font-size:0.83rem;color:#666;max-width:280px;line-height:1.8">間違えた問題をもう一度確認しよう！</p>
+  <button class="nav-btn primary" onclick="restart()">🔄 もう一度</button>
+</div>
+
+<script>
+const data = [
+  {
+    sentence: "<u>サッコン</u>の社会情勢に心を痛める。",
+    reading: "さっこん", fullKanji: "昨今",
+    emoji: "📰😔",
+    memory: "<strong>昨</strong>＝日＋乍（さっと変わる）→<strong>きのう・近ごろ</strong><br><strong>今</strong>＝今この瞬間<br>昨今＝近ごろ・最近のこと！",
+    stroke: "昨：全9画｜今：全4画"
+  },
+  {
+    sentence: "雑誌を増<u>サツ</u>する。",
+    reading: "さつ", fullKanji: "刷",
+    emoji: "📰🖨️",
+    memory: "<strong>刷</strong>＝尸＋刀＋巾→布で<strong>こすって印刷する</strong>象形<br>「印刷」「刷新」の刷！<br>「増刷」＝追加で刷ること",
+    stroke: "全8画｜訓：す（る）｜音：サツ"
+  },
+  {
+    sentence: "<u>サンサイ</u>を使った温泉宿の料理。",
+    reading: "さんさい", fullKanji: "山菜",
+    emoji: "🌿🍲",
+    memory: "<strong>菜</strong>＝草かんむり＋采（つむ）<br>草を<strong>手でつんで食べる</strong>象形！<br>「野菜」「菜の花」の菜",
+    stroke: "山：全3画｜菜：全11画"
+  },
+  {
+    sentence: "アサガオの<u>カンサツ</u>日記をつける。",
+    reading: "かんさつ", fullKanji: "観察",
+    emoji: "🌸🔍",
+    memory: "<strong>観</strong>＝見る・じっくり眺める<br><strong>察</strong>＝宀＋祭→家の中で<strong>よく調べる</strong><br>じっくり見て調べる＝観察！",
+    stroke: "観：全18画｜察：全14画"
+  },
+  {
+    sentence: "<u>ザイモク</u>を加工して家を建てる。",
+    reading: "ざいもく", fullKanji: "材木",
+    emoji: "🪵🏗️",
+    memory: "<strong>材</strong>＝木＋才→<strong>才能ある木</strong>＝使える木材<br><strong>木</strong>はそのまま木！<br>「材料」「人材」の材",
+    stroke: "材：全7画｜木：全4画"
+  },
+  {
+    sentence: "<u>サイゴ</u>に引いたくじが当たった。",
+    reading: "さいご", fullKanji: "最後",
+    emoji: "🎯🔚",
+    memory: "<strong>最</strong>＝日＋取→日の中で<strong>いちばん取る</strong><br>→いちばん・もっとも<br><strong>後</strong>＝うしろ・終わり＝最後！",
+    stroke: "最：全12画｜後：全9画"
+  },
+  {
+    sentence: "<u>ながさき</u>県出身の政治家。",
+    reading: "ながさき", fullKanji: "長崎",
+    emoji: "⛩️🗾",
+    memory: "<strong>長</strong>＝髪の長い人の象形→ながい<br><strong>崎</strong>＝山＋奇→<strong>山が突き出た岬</strong><br>九州の西の端にある県！",
+    stroke: "長：全8画｜崎：全11画"
+  },
+  {
+    sentence: "ドア横にかけられた<u>ヒョウサツ</u>。",
+    reading: "ひょうさつ", fullKanji: "表札",
+    emoji: "🚪📋",
+    memory: "<strong>表</strong>＝衣の外側→<strong>おもて・あらわす</strong><br><strong>札</strong>＝木＋乙→木の板に書いた<strong>ふだ</strong><br>名前をあらわすふだ＝表札！",
+    stroke: "表：全8画｜札：全5画"
+  },
+  {
+    sentence: "決断の<u>サンコウ</u>になりそうな資料。",
+    reading: "さんこう", fullKanji: "参考",
+    emoji: "📚💡",
+    memory: "<strong>参</strong>＝三つの星→<strong>くわわる・まいる</strong><br><strong>考</strong>＝老＋丂→<strong>年長者が考える</strong><br>考えるために加える＝参考！",
+    stroke: "参：全8画｜考：全6画"
+  },
+  {
+    sentence: "<u>いろずり</u>の美しい絵はがき。",
+    reading: "いろずり", fullKanji: "色刷り",
+    emoji: "🎨🖨️",
+    memory: "<strong>色</strong>＝人が顔を染める象形→いろ<br><strong>刷</strong>＝こすって印刷する<br>カラーで印刷したもの＝色刷り！",
+    stroke: "色：全6画｜刷：全8画"
+  },
+  {
+    sentence: "無人駅のだれも居ない<u>カイサツ</u>。",
+    reading: "かいさつ", fullKanji: "改札",
+    emoji: "🚉🎫",
+    memory: "<strong>改</strong>＝己＋攴→<strong>自分を正す・改める</strong><br><strong>札</strong>＝木の板のふだ→切符<br>切符を改めるところ＝改札！",
+    stroke: "改：全7画｜札：全5画"
+  },
+  {
+    sentence: "お祭りに<u>サンカ</u>してみこしを担ぐ。",
+    reading: "さんか", fullKanji: "参加",
+    emoji: "🏮🙌",
+    memory: "<strong>参</strong>＝くわわる・まいる<br><strong>加</strong>＝力＋口→力を加える<br>仲間に加わる＝参加！",
+    stroke: "参：全8画｜加：全5画"
+  },
+  {
+    sentence: "手芸の<u>ザイ</u>料を買う。",
+    reading: "ざい", fullKanji: "材",
+    emoji: "🧵✂️",
+    memory: "<strong>材料</strong>の「材」！<br>木＋才→<strong>才能ある木＝使える素材</strong><br>「材木」「人材」「教材」の材",
+    stroke: "全7画｜音：ザイ"
+  },
+  {
+    sentence: "危険を素早く<u>サッチ</u>して逃げる。",
+    reading: "さっち", fullKanji: "察知",
+    emoji: "⚠️🏃",
+    memory: "<strong>察</strong>＝宀＋祭→よく<strong>調べて見抜く</strong><br><strong>知</strong>＝矢＋口→的確に<strong>知る</strong><br>感じ取って知る＝察知！",
+    stroke: "察：全14画｜知：全8画"
+  },
+  {
+    sentence: "会社の発展のため優れた<u>ジンザイ</u>を採用する。",
+    reading: "じんざい", fullKanji: "人材",
+    emoji: "👔✨",
+    memory: "<strong>人</strong>＝人の象形<br><strong>材</strong>＝才能ある素材<br>才能ある人＝人材！<br>「人財」とも書く",
+    stroke: "人：全2画｜材：全7画"
+  },
+  {
+    sentence: "<u>ニフダ</u>がついた小包。",
+    reading: "にふだ", fullKanji: "荷札",
+    emoji: "📦🏷️",
+    memory: "<strong>荷</strong>＝草かんむり＋何→<strong>かつぐ荷物</strong><br><strong>札</strong>＝木の板のふだ<br>荷物につけるふだ＝荷札！",
+    stroke: "荷：全10画｜札：全5画"
+  },
+  {
+    sentence: "年賀状に版画を<u>スル</u>。",
+    reading: "する", fullKanji: "刷る",
+    emoji: "🖨️🎍",
+    memory: "<strong>刷（する）</strong>＝こすって印刷する<br>「印刷する」と同じ意味！<br>「刷る」の送り仮名に注意",
+    stroke: "全8画｜訓：す（る）｜音：サツ"
+  },
+  {
+    sentence: "<u>サクネン</u>の優勝校が初戦で負ける。",
+    reading: "さくねん", fullKanji: "昨年",
+    emoji: "📅🏆",
+    memory: "<strong>昨</strong>＝日＋乍→<strong>きのう・去った時間</strong><br><strong>年</strong>＝一年間<br>去った年＝昨年（去年）！",
+    stroke: "昨：全9画｜年：全6画"
+  },
+  {
+    sentence: "<u>サイタン</u>の道のりで駅まで五分。",
+    reading: "さいたん", fullKanji: "最短",
+    emoji: "📍⏱️",
+    memory: "<strong>最</strong>＝いちばん・もっとも<br><strong>短</strong>＝矢＋豆→矢と豆を比べて<strong>みじかい</strong><br>いちばん短い距離＝最短！",
+    stroke: "最：全12画｜短：全12画"
+  },
+  {
+    sentence: "<u>ヤサイ</u>をたくさん食べる。",
+    reading: "やさい", fullKanji: "野菜",
+    emoji: "🥦🥕",
+    memory: "<strong>野</strong>＝里＋予→里の外の<strong>広い野原</strong><br><strong>菜</strong>＝草をつんで食べる<br>野原で育てる食べ物＝野菜！",
+    stroke: "野：全11画｜菜：全11画"
+  },
+  {
+    sentence: "<u>サイキン</u>できたばかりの店。",
+    reading: "さいきん", fullKanji: "最近",
+    emoji: "🏪✨",
+    memory: "<strong>最</strong>＝いちばん・もっとも<br><strong>近</strong>＝しんにょう＋斤→<strong>近い・ちかごろ</strong><br>いちばん近い時＝最近！",
+    stroke: "最：全12画｜近：全7画"
+  },
+  {
+    sentence: "若者文化について<u>コウサツ</u>する。",
+    reading: "こうさつ", fullKanji: "考察",
+    emoji: "🤔🔍",
+    memory: "<strong>考</strong>＝老＋丂→<strong>年長者がじっくり考える</strong><br><strong>察</strong>＝よく調べて見抜く<br>深く考え調べる＝考察！",
+    stroke: "考：全6画｜察：全14画"
+  },
+  {
+    sentence: "すぐにそちらへ<u>マイ</u>ります。",
+    reading: "まいります", fullKanji: "参",
+    emoji: "🚶‍♂️🙇",
+    memory: "<strong>参（まいる）</strong>＝<strong>謙遜した「行く」「来る」</strong><br>丁寧語・謙譲語の「まいる」！<br>「お参り」「参拝」の参",
+    stroke: "全8画｜訓：まい（る）｜音：サン"
+  },
+  {
+    sentence: "家庭<u>サイエン</u>でトマトをつくる。",
+    reading: "さいえん", fullKanji: "菜園",
+    emoji: "🍅🌱",
+    memory: "<strong>菜</strong>＝草をつんで食べる<br><strong>園</strong>＝囗＋袁→<strong>囲まれた庭</strong><br>野菜を育てる庭＝菜園！",
+    stroke: "菜：全11画｜園：全13画"
+  },
+  {
+    sentence: "歴代<u>サイコウ</u>の得点をあげる。",
+    reading: "さいこう", fullKanji: "最高",
+    emoji: "🏅🎯",
+    memory: "<strong>最</strong>＝いちばん・もっとも<br><strong>高</strong>＝高い建物の象形<br>いちばん高い＝最高！",
+    stroke: "最：全12画｜高：全10画"
+  },
+  {
+    sentence: "書類を<u>インサツ</u>する。",
+    reading: "いんさつ", fullKanji: "印刷",
+    emoji: "🖨️📄",
+    memory: "<strong>印</strong>＝手で人を押さえる→<strong>おす・しるし</strong><br><strong>刷</strong>＝こすって印刷する<br>しるしをつけて刷る＝印刷！",
+    stroke: "印：全6画｜刷：全8画"
+  },
+  {
+    sentence: "テレビ局の<u>シュザイ</u>を受ける。",
+    reading: "しゅざい", fullKanji: "取材",
+    emoji: "🎥🎤",
+    memory: "<strong>取</strong>＝又＋耳→耳を<strong>つかみ取る</strong><br><strong>材</strong>＝使える素材・情報<br>情報をつかみ取る＝取材！",
+    stroke: "取：全8画｜材：全7画"
+  },
+  {
+    sentence: "<u>サツ</u>束に帯封をつける。",
+    reading: "さつ", fullKanji: "冊",
+    emoji: "📚🪢",
+    memory: "<strong>冊</strong>＝木の板（竹簡）を<strong>ひもで束ねた</strong>象形<br>本・書物を数える単位！<br>「冊子（さっし）」「別冊」の冊",
+    stroke: "全5画｜音：サツ・サク"
+  },
+  {
+    sentence: "警<u>サツ</u>学校に入学する。",
+    reading: "さつ", fullKanji: "察",
+    emoji: "👮🏫",
+    memory: "<strong>警察</strong>の「察」！<br>宀＋祭→<strong>よく調べて見抜く</strong><br>「観察」「察知」「視察」の察",
+    stroke: "全14画｜音：サツ"
+  },
+  {
+    sentence: "彼らがアメリカへ出発したのは<u>サクジツ</u>のことだ。",
+    reading: "さくじつ", fullKanji: "昨日",
+    emoji: "✈️📅",
+    memory: "<strong>昨</strong>＝日＋乍→<strong>きのう・去った時間</strong><br><strong>日</strong>＝一日<br>去った日＝昨日（きのう）！",
+    stroke: "昨：全9画｜日：全4画"
+  },
+  {
+    sentence: "一面に広がる<u>ナノハナ</u>畑。",
+    reading: "なのはな", fullKanji: "菜の花",
+    emoji: "🌼🌾",
+    memory: "<strong>菜</strong>＝草をつんで食べる野菜<br><strong>花</strong>＝草かんむり＋化→<strong>変化して咲く</strong><br>春に黄色く咲く菜の花！",
+    stroke: "菜：全11画｜花：全7画"
+  },
+  {
+    sentence: "東京の若者を<u>ダイザイ</u>にした映画。",
+    reading: "だいざい", fullKanji: "題材",
+    emoji: "🎬💡",
+    memory: "<strong>題</strong>＝是＋頁→<strong>テーマ・題名</strong><br><strong>材</strong>＝使える素材<br>テーマのもとになる素材＝題材！",
+    stroke: "題：全18画｜材：全7画"
+  },
+  {
+    sentence: "電車で横浜から<u>サイタマ</u>県へ向かう。",
+    reading: "さいたま", fullKanji: "埼玉",
+    emoji: "🚃🗾",
+    memory: "<strong>埼</strong>＝土＋奇→<strong>土地が突き出た岬</strong><br><strong>玉</strong>＝まるい宝石の象形<br>関東地方の都道府県！",
+    stroke: "埼：全11画｜玉：全5画"
+  },
+  {
+    sentence: "電話の様子から緊急事態が起きたことを<u>サッ</u>する。",
+    reading: "さっする", fullKanji: "察",
+    emoji: "📞💭",
+    memory: "<strong>察する</strong>＝よく考えて<strong>見抜く・推測する</strong><br>「空気を察する」「察知」の察！<br>宀＋祭→家の中でよく調べる",
+    stroke: "全14画｜訓：さっ（する）｜音：サツ"
+  },
+  {
+    sentence: "経営の体制を<u>サッシン</u>する。",
+    reading: "さっしん", fullKanji: "刷新",
+    emoji: "🔄✨",
+    memory: "<strong>刷</strong>＝こすって新しくする<br><strong>新</strong>＝斤＋木＋辛→<strong>新しく切り出す</strong><br>すっかり新しくする＝刷新！",
+    stroke: "刷：全8画｜新：全13画"
+  },
+  {
+    sentence: "<u>イッサクネン</u>の夏の楽しい思い出。",
+    reading: "いっさくねん", fullKanji: "一昨年",
+    emoji: "📅🌻",
+    memory: "<strong>一</strong>＝ひとつ前<br><strong>昨</strong>＝去った時間<br><strong>年</strong>＝一年<br>去年のさらに一つ前＝一昨年！",
+    stroke: "一：全1画｜昨：全9画｜年：全6画"
+  },
+  {
+    sentence: "この古い村では<u>シンザン</u>者である。",
+    reading: "しんざん", fullKanji: "新参",
+    emoji: "🏘️🆕",
+    memory: "<strong>新</strong>＝あたらしい<br><strong>参</strong>＝くわわる<br>新たに加わった人＝新参者！<br>「新参者」はまだ日が浅い人",
+    stroke: "新：全13画｜参：全8画"
+  },
+  {
+    sentence: "一年で<u>モット</u>も暑い日。",
+    reading: "もっとも", fullKanji: "最も",
+    emoji: "☀️🌡️",
+    memory: "<strong>最（もっとも）</strong>＝日＋取→<strong>いちばん・きわめて</strong><br>「最高」「最近」「最後」全部この「最」！<br>送り仮名「も」に注意",
+    stroke: "全12画｜訓：もっと（も）｜音：サイ"
+  },
+  {
+    sentence: "<u>フダショ</u>でごしゅいんをいただく。",
+    reading: "ふだしょ", fullKanji: "札所",
+    emoji: "⛩️📿",
+    memory: "<strong>札</strong>＝木の板のふだ→<strong>お寺・神社のふだ</strong><br><strong>所</strong>＝戸＋斤→<strong>場所</strong><br>お参りできる場所＝札所！",
+    stroke: "札：全5画｜所：全8画"
+  },
+  {
+    sentence: "正月に一家で<u>おみやまいり</u>をする。",
+    reading: "おみやまいり", fullKanji: "お宮参り",
+    emoji: "⛩️👶",
+    memory: "<strong>宮</strong>＝宀＋呂→<strong>部屋がたくさんある神聖な建物</strong><br><strong>参り</strong>＝まいる→神社に行く<br>神社へお参りすること＝宮参り！",
+    stroke: "宮：全10画｜参：全8画"
+  },
+];
+
+let current = 0;
+let flipped = false;
+let mode = 'flash';
+let quizScores = new Array(40).fill(null);
+
+function formatSentence(s) {
+  return s.replace(/<u>(.*?)<\/u>/g, (_, t) => `<span class="ul">${t}</span>`);
+}
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.mode-tab').forEach((t, i) =>
+    t.classList.toggle('active', (i === 0 && m === 'flash') || (i === 1 && m === 'quiz'))
+  );
+  flipped = false;
+  document.getElementById('card').classList.remove('flipped');
+  renderCard();
+}
+
+function renderCard() {
+  const d = data[current];
+  document.getElementById('progress').style.width = ((current + 1) / 40 * 100) + '%';
+  document.getElementById('counter').textContent = `${current + 1} / 40`;
+  document.getElementById('prevBtn').disabled = current === 0;
+  document.getElementById('nextBtn').textContent = current === 39 ? '完了 ✓' : '次 →';
+
+  const front = document.getElementById('front');
+  const back = document.getElementById('back');
+
+  front.innerHTML = `
+    <span class="question-num">問 ${current + 1}</span>
+    <p class="instruction">— 下線部を漢字に直しなさい —</p>
+    <div class="sentence-wrap">${formatSentence(d.sentence)}</div>
+    <p class="reading-hint">よみ：${d.reading}</p>
+    ${mode === 'quiz' ? `
+      <div class="quiz-input-area" onclick="event.stopPropagation()">
+        <input class="quiz-input" id="quizInput" type="text" placeholder="漢字を書こう"
+          onkeydown="if(event.key==='Enter')checkAnswer()">
+        <button class="check-btn" onclick="checkAnswer()">確認する</button>
+        <p class="result-msg" id="resultMsg"></p>
+      </div>
+    ` : `<span class="tap-hint">👆 タップして答えを見る</span>`}
+  `;
+
+  back.innerHTML = `
+    <p class="kanji-big">${d.fullKanji}</p>
+    <p class="reading-back">📖 ${d.reading}</p>
+    <div class="divider"></div>
+    <div class="image-area">
+      <div class="emoji-scene">${d.emoji}</div>
+      <p class="memory-text">${d.memory}</p>
+    </div>
+    <p class="stroke-hint">✏️ ${d.stroke}</p>
+  `;
+}
+
+function flipCard() {
+  if (mode === 'quiz') return;
+  flipped = !flipped;
+  document.getElementById('card').classList.toggle('flipped', flipped);
+}
+
+function checkAnswer() {
+  const input = document.getElementById('quizInput');
+  const msg = document.getElementById('resultMsg');
+  const val = input.value.trim();
+  const d = data[current];
+  const correct = d.fullKanji;
+  const correctCore = correct.replace(/[ぁ-んのをはがもでにへとやよ]/g, '');
+  const ok = val === correct || val === correctCore;
+
+  if (ok) {
+    input.className = 'quiz-input correct';
+    msg.className = 'result-msg ok';
+    msg.textContent = '⭕ 正解！「' + correct + '」';
+    quizScores[current] = true;
+  } else {
+    input.className = 'quiz-input wrong';
+    msg.className = 'result-msg ng';
+    msg.textContent = '❌ 正解は「' + correct + '」';
+    quizScores[current] = false;
+  }
+  flipped = true;
+  document.getElementById('card').classList.add('flipped');
+}
+
+function prev() {
+  if (current > 0) {
+    current--;
+    flipped = false;
+    document.getElementById('card').classList.remove('flipped');
+    renderCard();
+  }
+}
+
+function next() {
+  if (current < 39) {
+    current++;
+    flipped = false;
+    document.getElementById('card').classList.remove('flipped');
+    renderCard();
+  } else {
+    const score = quizScores.filter(s => s === true).length;
+    document.querySelector('.card-container').style.display = 'none';
+    document.querySelector('.nav').style.display = 'none';
+    document.querySelector('.progress-bar').style.display = 'none';
+    document.getElementById('counter').style.display = 'none';
+    document.querySelector('.mode-tabs').style.display = 'none';
+    const c = document.getElementById('complete');
+    c.classList.add('show');
+    if (mode === 'quiz') {
+      document.getElementById('scoreNum').textContent = score;
+      document.getElementById('scoreCircle').style.display = 'flex';
+    } else {
+      document.getElementById('scoreCircle').style.display = 'none';
+    }
+  }
+}
+
+function restart() {
+  current = 0;
+  flipped = false;
+  quizScores = new Array(40).fill(null);
+  document.querySelector('.card-container').style.display = 'block';
+  document.querySelector('.nav').style.display = 'flex';
+  document.querySelector('.progress-bar').style.display = 'block';
+  document.getElementById('counter').style.display = 'block';
+  document.querySelector('.mode-tabs').style.display = 'flex';
+  document.getElementById('complete').classList.remove('show');
+  document.getElementById('card').classList.remove('flipped');
+  renderCard();
+}
+
+renderCard();
+</script>
+</body>
+</html>
