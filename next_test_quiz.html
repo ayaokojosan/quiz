@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>次回テスト対策クイズ</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f5f7ff;
+  --card:#ffffff;
+  --border:#dde5f5;
+  --primary:#3C3489;
+  --primary-light:#EEEDFE;
+  --text:#1a1a2e;
+  --text2:#5566aa;
+  --text3:#9aaabb;
+  --ok:#0F6E56;
+  --ok-bg:#E1F5EE;
+  --ok-border:#1D9E75;
+  --ng:#993C1D;
+  --ng-bg:#FAECE7;
+  --ng-border:#D85A30;
+  --hint-bg:#EEEDFE;
+  --hint-text:#3C3489;
+}
+body{font-family:-apple-system,'Hiragino Maru Gothic ProN','M PLUS Rounded 1c',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);padding:12px;}
+h1{text-align:center;font-size:20px;color:var(--primary);margin-bottom:3px;font-weight:700;}
+.subtitle{text-align:center;font-size:12px;color:var(--text2);margin-bottom:14px;}
+
+.top-tabs{display:flex;gap:6px;justify-content:center;margin-bottom:14px;flex-wrap:wrap;}
+.ttab{padding:8px 16px;border-radius:20px;border:2px solid var(--border);background:#fff;font-size:13px;cursor:pointer;color:var(--text2);font-family:inherit;font-weight:700;transition:all .15s;}
+.ttab.on{background:var(--primary);border-color:var(--primary);color:#fff;}
+
+.screen{display:none;}.screen.active{display:block;}
+
+.sub-tabs{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;}
+.stab{padding:6px 12px;border-radius:16px;border:2px solid var(--border);background:#fff;font-size:12px;cursor:pointer;color:var(--text2);font-family:inherit;font-weight:700;}
+.stab.on{background:var(--primary);border-color:var(--primary);color:#fff;}
+
+.kari-tabs{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;}
+.ktab{padding:6px 12px;border-radius:16px;border:2px solid var(--border);background:#fff;font-size:12px;cursor:pointer;color:var(--text2);font-family:inherit;font-weight:700;}
+.ktab.on{background:var(--primary);border-color:var(--primary);color:#fff;}
+
+.pbar-wrap{max-width:520px;margin:0 auto 12px;}
+.pbar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.pfill{height:100%;background:var(--primary);border-radius:3px;transition:width .3s;}
+.ctr{text-align:center;font-size:13px;color:var(--text2);margin-bottom:8px;}
+.card-wrap{max-width:520px;margin:0 auto 12px;}
+.card{border-radius:16px;border:2px solid var(--border);background:var(--card);overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(60,52,137,.06);}
+.cfront,.cback{padding:18px 18px 14px;}
+.cback{display:none;border-top:2px solid var(--border);background:var(--hint-bg);}
+.cback.show{display:block;}
+.sbadge{font-size:11px;padding:3px 10px;border-radius:10px;background:var(--border);color:var(--text2);display:inline-block;margin-bottom:8px;font-weight:700;}
+.qlabel{font-size:11px;color:var(--text3);margin-bottom:5px;letter-spacing:.04em;}
+.qtext{font-size:15px;font-weight:700;color:var(--text);line-height:1.7;margin-bottom:8px;white-space:pre-wrap;}
+.taphint{font-size:12px;color:var(--text3);text-align:center;padding:6px 0;}
+.alabel{font-size:11px;color:var(--primary);margin-bottom:3px;letter-spacing:.04em;}
+.atext{font-size:20px;font-weight:700;color:var(--primary);margin-bottom:8px;}
+.hintbox{font-size:12px;color:var(--hint-text);background:#fff;border-radius:10px;padding:8px 12px;line-height:1.8;}
+.cautbox{font-size:12px;color:var(--ng);background:var(--ng-bg);border-radius:10px;padding:6px 12px;margin-top:6px;}
+
+.btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:6px;max-width:520px;margin-left:auto;margin-right:auto;}
+.btn{padding:8px 16px;border-radius:10px;border:2px solid var(--border);background:#fff;font-size:13px;cursor:pointer;color:var(--text);font-family:inherit;font-weight:700;transition:all .12s;}
+.btn:hover{background:var(--border);}
+.btn-ok{border-color:var(--ok-border);color:var(--ok);}
+.btn-ok:hover{background:var(--ok-bg);}
+.btn-ng{border-color:var(--ng-border);color:var(--ng);}
+.btn-ng:hover{background:var(--ng-bg);}
+.jrow{display:none;}.jrow.show{display:flex;}
+
+.complete{text-align:center;padding:30px 16px;display:none;max-width:520px;margin:0 auto;}
+.note-sec{margin-top:18px;border:2px solid var(--border);border-radius:14px;padding:14px;text-align:left;}
+.note-t{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px;}
+.note-i{font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);line-height:1.7;color:var(--text2);}
+.note-i:last-child{border-bottom:none;}
+.note-a{color:var(--primary);font-weight:700;}
+
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;max-width:520px;margin-left:auto;margin-right:auto;}
+.mcard{border:2px solid var(--border);border-radius:12px;padding:12px 10px;cursor:pointer;background:#fff;transition:all .15s;}
+.mcard:hover,.mcard.sel{border-color:var(--primary);background:var(--primary-light);}
+.mlabel{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.mdesc{font-size:11px;color:var(--text2);}
+.sf-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+.sf{padding:6px 12px;border-radius:16px;border:2px solid var(--border);background:#fff;font-size:12px;cursor:pointer;color:var(--text2);font-family:inherit;font-weight:700;}
+.sf.on{background:var(--primary);border-color:var(--primary);color:#fff;}
+.startbtn{width:100%;max-width:280px;padding:14px;border-radius:12px;background:var(--primary);border:none;color:#fff;font-size:15px;font-family:inherit;cursor:pointer;font-weight:700;display:block;margin:0 auto;transition:all .15s;}
+.startbtn:hover{background:#534AB7;}
+
+.qhdr{display:flex;align-items:center;gap:8px;margin-bottom:10px;max-width:520px;margin-left:auto;margin-right:auto;}
+.tbox{display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:18px;border:2px solid var(--border);background:#fff;}
+.tnum2{font-size:18px;font-weight:700;min-width:28px;}
+.tnum2.warn{color:var(--ng);}
+.slive{font-size:13px;color:var(--primary);font-weight:700;}
+.qcnt{margin-left:auto;font-size:12px;color:var(--text2);}
+.qbox{background:#fff;border:2px solid var(--border);border-radius:14px;padding:16px 14px 12px;margin-bottom:10px;max-width:520px;margin-left:auto;margin-right:auto;box-shadow:0 2px 8px rgba(60,52,137,.04);}
+.qbox .qtext{margin-bottom:8px;}
+.choices2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;max-width:520px;margin-left:auto;margin-right:auto;}
+.choice2{padding:12px 8px;border-radius:12px;border:2px solid var(--border);background:#fff;font-size:13px;cursor:pointer;color:var(--text);font-family:inherit;font-weight:700;text-align:center;line-height:1.5;transition:all .12s;}
+.choice2:hover{border-color:var(--primary);background:var(--primary-light);}
+.choice2.correct{border-color:var(--ok-border);background:var(--ok-bg);color:var(--ok);pointer-events:none;}
+.choice2.wrong{border-color:var(--ng-border);background:var(--ng-bg);color:var(--ng);pointer-events:none;}
+.choice2.disabled{pointer-events:none;opacity:.4;}
+
+.res-area{text-align:center;padding:24px 10px;max-width:520px;margin:0 auto;}
+.res-emoji{font-size:48px;margin-bottom:8px;}
+.res-score{font-size:36px;font-weight:700;color:var(--primary);margin-bottom:4px;}
+.res-msg{font-size:14px;color:var(--text2);margin-bottom:16px;}
+.rgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
+.sbox{background:var(--border);border-radius:12px;padding:10px 6px;}
+.sval{font-size:20px;font-weight:700;color:var(--text);}
+.skey{font-size:11px;color:var(--text2);margin-top:2px;}
+.wlist{text-align:left;border:2px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:16px;max-height:180px;overflow-y:auto;}
+.witem{padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.witem:last-child{border-bottom:none;}
+.wq{color:var(--text2);margin-bottom:3px;}
+.wa{color:var(--primary);font-weight:700;}
+.rbtn{padding:11px 26px;border-radius:12px;background:var(--primary);border:none;color:#fff;font-size:14px;font-family:inherit;cursor:pointer;font-weight:700;margin:3px;}
+.rbtn2{padding:11px 26px;border-radius:12px;border:2px solid var(--border);background:#fff;font-size:14px;font-family:inherit;cursor:pointer;font-weight:700;margin:3px;color:var(--text);}
+</style>
+</head>
+<body>
+<h1>📝 次回テスト対策クイズ</h1>
+<p class="subtitle">理科・社会・国語の新範囲を特訓！</p>
+
+<div class="top-tabs">
+  <button class="ttab on" onclick="switchTop('cards',this)">📚 覚えるカード</button>
+  <button class="ttab" onclick="switchTop('quiz',this)">⚡ タイムアタック</button>
+</div>
+
+<div id="cards" class="screen active">
+  <div class="sub-tabs">
+    <button class="stab on" onclick="setSubj('all',this)">全科目</button>
+    <button class="stab" onclick="setSubj('science',this)">🔬理科</button>
+    <button class="stab" onclick="setSubj('social',this)">🗾社会</button>
+    <button class="stab" onclick="setSubj('japanese',this)">✏️国語</button>
+  </div>
+  <div class="kari-tabs">
+    <button class="ktab on" onclick="setKari('all',this)">全範囲</button>
+    <button class="ktab" onclick="setKari('8',this)">第8回</button>
+    <button class="ktab" onclick="setKari('9',this)">第9回</button>
+  </div>
+  <div class="ctr" id="ctr">1/1</div>
+  <div class="pbar-wrap"><div class="pbar"><div class="pfill" id="cpfill" style="width:0%"></div></div></div>
+  <div class="card-wrap" id="cardwrap">
+    <div class="card" id="thecard">
+      <div class="cfront">
+        <div class="sbadge" id="cbadge">-</div>
+        <div class="qlabel">問題</div>
+        <div class="qtext" id="cqtext">-</div>
+        <div class="taphint" id="ctaphint">👆 タップして答えを見る</div>
+      </div>
+      <div class="cback" id="cback">
+        <div class="alabel">答え</div>
+        <div class="atext" id="catext">-</div>
+        <div class="hintbox" id="chint"></div>
+        <div class="cautbox" id="ccaut" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="btns jrow" id="jrow">
+    <button class="btn btn-ng" onclick="judge(false)">😓 もう一度</button>
+    <button class="btn btn-ok" onclick="judge(true)">✅ わかった！</button>
+  </div>
+  <div class="btns">
+    <button class="btn" onclick="cprev()">← 前へ</button>
+    <button class="btn" onclick="cshuffle()">🔀 シャッフル</button>
+    <button class="btn" onclick="cnext()">次へ →</button>
+  </div>
+  <div class="complete" id="ccomplete">
+    <div style="font-size:48px;margin-bottom:10px;">⭐</div>
+    <div style="font-size:22px;font-weight:700;margin-bottom:6px;">全部チェックした！</div>
+    <div style="font-size:14px;color:var(--text2);margin-bottom:18px;" id="cscmsg"></div>
+    <button class="btn startbtn" onclick="crestart()" style="margin-bottom:16px;">もう一度チャレンジ</button>
+  </div>
+</div>
+
+<div id="quiz" class="screen">
+  <div id="qstart" style="max-width:520px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px;">⚡ タイムアタッククイズ</div>
+      <div style="font-size:12px;color:var(--text2);">次回テスト範囲まとめて特訓！</div>
+    </div>
+    <div class="mode-grid">
+      <div class="mcard sel" onclick="selMode(this,20)"><div class="mlabel">🔥 ノーマル</div><div class="mdesc">1問20秒</div></div>
+      <div class="mcard" onclick="selMode(this,10)"><div class="mlabel">⚡ 超速</div><div class="mdesc">1問10秒</div></div>
+      <div class="mcard" onclick="selMode(this,30)"><div class="mlabel">😌 ゆっくり</div><div class="mdesc">1問30秒</div></div>
+      <div class="mcard" onclick="selMode(this,0)"><div class="mlabel">♾️ 制限なし</div><div class="mdesc">じっくり考える</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--text2);text-align:center;margin-bottom:6px;">科目を絞る</div>
+    <div class="sf-row">
+      <button class="sf on" onclick="selSf(this,'all')">全科目</button>
+      <button class="sf" onclick="selSf(this,'science')">🔬理科</button>
+      <button class="sf" onclick="selSf(this,'social')">🗾社会</button>
+      <button class="sf" onclick="selSf(this,'japanese')">✏️国語</button>
+    </div>
+    <button class="startbtn" onclick="startQuiz()">スタート！</button>
+  </div>
+
+  <div id="qmain" style="display:none;">
+    <div class="qhdr">
+      <div class="tbox"><span style="font-size:12px;">⏱</span><span class="tnum2" id="tnum">20</span></div>
+      <span class="slive" id="slive">0点</span>
+      <span class="qcnt" id="qcnt">1/40</span>
+    </div>
+    <div class="pbar-wrap" style="margin-bottom:10px;"><div class="pbar"><div class="pfill" id="qpfill"></div></div></div>
+    <div style="display:inline-block;font-size:11px;padding:3px 10px;border-radius:10px;background:var(--border);color:var(--text2);margin-bottom:6px;font-weight:700;" id="qstag">-</div>
+    <div class="qbox">
+      <div class="qtext" id="qqtext">-</div>
+    </div>
+    <div class="choices2" id="qchoices"></div>
+    <div style="text-align:center;font-size:14px;font-weight:700;min-height:20px;margin-bottom:6px;max-width:520px;margin-left:auto;margin-right:auto;" id="qfb"></div>
+    <div style="background:var(--hint-bg);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--hint-text);line-height:1.8;display:none;margin-bottom:8px;max-width:520px;margin-left:auto;margin-right:auto;" id="qexplain"></div>
+  </div>
+
+  <div id="qresult" class="res-area" style="display:none;">
+    <div class="res-emoji" id="remoji">🎉</div>
+    <div class="res-score" id="rscore">0点</div>
+    <div class="res-msg" id="rmsg">-</div>
+    <div class="rgrid">
+      <div class="sbox"><div class="sval" id="rcor">0</div><div class="skey">正解</div></div>
+      <div class="sbox"><div class="sval" id="rwrong">0</div><div class="skey">不正解</div></div>
+      <div class="sbox"><div class="sval" id="rtime">0</div><div class="skey">タイムアウト</div></div>
+    </div>
+    <div id="wlist" class="wlist" style="display:none;">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px;">📝 間違えた問題</div>
+      <div id="witems"></div>
+    </div>
+    <button class="rbtn" onclick="restartQuiz()">もう一度！</button>
+    <button class="rbtn2" onclick="backToStart()">設定に戻る</button>
+  </div>
+</div>
+
+<script>
+const allCards=[
+  // 理科第8回 水のすがた
+  {s:'science',k:'8',q:'水は、沸き立たなくても\n空気中に出ていきます。このことを何という？',a:'蒸発',hint:'液体が気体に変わること。温度が高いほど蒸発しやすい。'},
+  {s:'science',k:'8',q:'水を熱したとき、大きな泡が出て\n沸き立つことを何という？',a:'沸とう（ふっとう）',hint:'100℃で起こる現象。泡の正体は水蒸気。'},
+  {s:'science',k:'8',q:'沸とうしているとき、水の温度は何℃？\n（さらに熱しても温度は変わらない）',a:'100℃',hint:'水の沸点。これ以上温度は上がらない。'},
+  {s:'science',k:'8',q:'水に食塩を混ぜて\n大きく温度が下がるようにしたものを何という？',a:'寒剤（かんざい）',hint:'氷と食塩を混ぜて作る。0℃より冷たくなる。'},
+  {s:'science',k:'8',q:'水は何℃になると凍り始める？\n氷は何℃になると溶け始める？',a:'0℃で凍る、0℃で溶ける',hint:'氷と水の境界温度。両方とも0℃。'},
+  {s:'science',k:'8',q:'水が水蒸気になると\n体積はおよそ何倍になる？',a:'約1600倍',hint:'液体から気体への変化で体積が大幅に増加。'},
+  {s:'science',k:'8',q:'水のような液体、氷のような固体、\n水蒸気のような気体を\nまとめて何という？',a:'すがた',hint:'物質の三つの状態。固体・液体・気体。'},
+  {s:'science',k:'8',q:'地球上で水がいろいろなすがたで\nめぐっています。そのエネルギーは何？',a:'太陽エネルギー',hint:'太陽の熱で蒸発し、冷えて雨になる循環。'},
+
+  // 理科第9回 光
+  {s:'science',k:'9',q:'見える物のうち、\n自ら光を出している物を何という？',a:'光源（こうげん）',hint:'太陽・電灯・ろうそくなど。自分で光る物。'},
+  {s:'science',k:'9',q:'光にはまっすぐに進む性質がある。\nこれを何という？',a:'光の直進（ちょくしん）',hint:'光が直線に進む性質。影ができる理由。'},
+  {s:'science',k:'9',q:'光が鏡などによって\nはね返される性質を何という？',a:'光の反射（はんしゃ）',hint:'入射角＝反射角の法則がある。'},
+  {s:'science',k:'9',q:'光が鏡に当たるとき、\n入射角と反射角の大きさは？',a:'いつも同じ大きさになる',hint:'反射の法則。入射角＝反射角。'},
+  {s:'science',k:'9',q:'鏡に映る自分の像について、\n本当の自分と鏡の間の距離と\n鏡と像の間の距離は？',a:'いつも同じ距離になる',hint:'鏡を境に対称な位置に像ができる。'},
+  {s:'science',k:'9',q:'光が性質の違う物の中へ進むとき、\nその境目で曲がることを何という？',a:'光の屈折（くっせつ）',hint:'空気から水、水から空気など。進む方向が変わる。'},
+  {s:'science',k:'9',q:'虫めがねで太陽の光を通したときに\n光が集まる点を何という？',a:'焦点（しょうてん）',hint:'レンズの中心から焦点までの距離が焦点距離。'},
+  {s:'science',k:'9',q:'同じ直径の虫めがねを比べたとき、\n厚みが厚い方の焦点距離は？',a:'短くなる（焦点距離が短い）',hint:'厚い虫めがねほど光をよく集める。'},
+
+  // 社会第8回 地図の見方(2)
+  {s:'social',k:'8',q:'海面から同じ高さのところを\n結んだ線を何という？',a:'等高線（とうこうせん）',hint:'地図で高さを表す大切な線。'},
+  {s:'social',k:'8',q:'等高線の間隔が狭いところは\n土地のかたむきは？',a:'急（きゅう）',hint:'間隔が狭い＝急斜面、間隔が広い＝ゆるやか。'},
+  {s:'social',k:'8',q:'土地の高さは、\nどこを基準にしている？',a:'海面',hint:'海抜○mという表現の基準。'},
+  {s:'social',k:'8',q:'土地を真上から見た図を何という？',a:'平面図（へいめんず）',hint:'上から見下ろした図。地図の基本。'},
+  {s:'social',k:'8',q:'土地の切り口を表した図を何という？',a:'断面図（だんめんず）',hint:'横から見た土地の形。高低がよくわかる。'},
+  {s:'social',k:'8',q:'実際の長さを縮めた\n割合のことを何という？',a:'縮尺（しゅくしゃく）',hint:'地図上の距離と実際の距離の比。'},
+  {s:'social',k:'8',q:'縮尺25000分の1の地図で\n地図上3cmは実際の長さ何m？',a:'750m（0.75km）',hint:'3cm×25000＝75000cm＝750m'},
+  {s:'social',k:'8',q:'縮尺50000分の1の地図で\n地図上3cmは実際の長さ何km？',a:'1.5km',hint:'3cm×50000＝150000cm＝1500m＝1.5km'},
+
+  // 社会第9回 沖縄
+  {s:'social',k:'9',q:'沖縄県の県庁所在地は？',a:'那覇市（なはし）',hint:'沖縄本島にある県庁所在地。'},
+  {s:'social',k:'9',q:'九州と台湾の間に\n約1200kmにわたって続く島々を何という？',a:'南西諸島（なんせいしょとう）',hint:'沖縄県を含む島々の総称。'},
+  {s:'social',k:'9',q:'日本の西の果てにある島の名は？',a:'与那国島（よなぐにじま）',hint:'日本最西端の島。台湾に近い。'},
+  {s:'social',k:'9',q:'1月の平均気温が約何℃？\n平均気温が20℃以上の月は？',a:'17℃、4〜11月',hint:'一年中暖かい沖縄の気候。'},
+  {s:'social',k:'9',q:'台風の強い風に飛ばされないように\n屋根にのせてある重いものは？',a:'かわら',hint:'赤いかわらが沖縄の特色。風対策。'},
+  {s:'social',k:'9',q:'水不足になりやすい沖縄で\n家の屋根の上に置かれたものは？',a:'給水タンク',hint:'水をためておくタンク。白いタンクが特徴的。'},
+  {s:'social',k:'9',q:'沖縄で栽培が盛んで\n12月や3月に出荷している作物は？',a:'さとうきび',hint:'砂糖の原料。沖縄の代表的作物。'},
+  {s:'social',k:'9',q:'お正月用として12月に\n沖縄から東京などに出荷される花は？',a:'きく',hint:'野菜や花なども飛行機や船で本土へ。'},
+  {s:'social',k:'9',q:'約600年前〜約140年前に\n沖縄にあった王国の名前は？',a:'琉球王国（りゅうきゅうおうこく）',hint:'首里城があった独立した王国。'},
+
+  // 国語 同訓異字
+  {s:'japanese',k:'all',q:'「あつい」の使い分け\n気温が高い→（　）い\n温度が高い→（　）い',a:'暑い / 熱い',hint:'天気→暑い、お湯→熱い'},
+  {s:'japanese',k:'all',q:'「あける」の使い分け\n扉を（　）る\n席を（　）る',a:'開ける / 空ける',hint:'扉→開ける、席→空ける'},
+  {s:'japanese',k:'all',q:'「さめる」の使い分け\n夢から（　）る\n料理が（　）る',a:'覚める / 冷める',hint:'眠り→覚める、温度→冷める'},
+  {s:'japanese',k:'all',q:'「なおす」の使い分け\n姿勢を（　）\n病気を（　）',a:'直す / 治す',hint:'まっすぐ→直す、病気→治す'},
+  {s:'japanese',k:'all',q:'「おう」の使い分け\n敵を（　）\n荷物を（　）',a:'追う / 負う',hint:'後を→追う、背中に→負う'},
+  {s:'japanese',k:'all',q:'「さす」の使い分け\n方向を（　）\n薬を（　）',a:'指す / 差す',hint:'方向→指す、目薬→差す'},
+
+  // 国語 同音異義語（推測）
+  {s:'japanese',k:'all',q:'「きかい」の使い分け\n（　）を操作する\n（　）に恵まれる',a:'機械 / 機会',hint:'機械→マシン、機会→チャンス'},
+  {s:'japanese',k:'all',q:'「いし」の使い分け\n（　）を投げる\n（　）を持つ',a:'石 / 意志',hint:'石→物、意志→気持ち'},
+  {s:'japanese',k:'all',q:'「こうせい」の使い分け\n（　）な取引\n法律を（　）する',a:'公正 / 構成',hint:'公正→正しい、構成→組み立てる'},
+
+  // 国語 漢字確認（一部推測含む）
+  {s:'japanese',k:'all',q:'「にんきがある」を漢字で',a:'人気がある',hint:'みんなに愛されること'},
+  {s:'japanese',k:'all',q:'「せいかく」を漢字で',a:'正確',hint:'正しくて確実なこと'},
+  {s:'japanese',k:'all',q:'「かんさつ」を漢字で',a:'観察',hint:'よく見て調べること'},
+  {s:'japanese',k:'all',q:'「さんこう」を漢字で',a:'参考',hint:'判断の材料にすること'},
+  {s:'japanese',k:'all',q:'「いんさつ」を漢字で',a:'印刷',hint:'本や新聞を刷ること'},
+  {s:'japanese',k:'all',q:'「しゅざい」を漢字で',a:'取材',hint:'ニュースの材料を集めること'},
+  {s:'japanese',k:'all',q:'「けいけん」を漢字で',a:'経験',hint:'実際に体験すること'},
+  {s:'japanese',k:'all',q:'「けんぜん」を漢字で',a:'健全',hint:'健康で正常なこと'},
+  {s:'japanese',k:'all',q:'「こうろう」を漢字で',a:'功労',hint:'手柄を立てること'},
+  {s:'japanese',k:'all',q:'「きょうこ」を漢字で',a:'強固',hint:'しっかりしていること'},
+];
+
+const allQuiz=[
+  // 理科第8回 水のすがた
+  {s:'science',k:'8',q:'水は、沸き立たなくても空気中に出ていきます。このことを何という？',c:['蒸発','沸とう','昇華','気化'],a:0,ex:'液体が気体に変わること。温度が高いほど蒸発しやすい。'},
+  {s:'science',k:'8',q:'水を熱したとき、大きな泡が出て沸き立つことを何という？',c:['蒸発','沸とう','凝固','融解'],a:1,ex:'100℃で起こる現象。泡の正体は水蒸気。'},
+  {s:'science',k:'8',q:'沸とうが起こる水の温度は？',c:['50℃','75℃','90℃','100℃'],a:3,ex:'水の沸点。これ以上温度は上がらない。'},
+  {s:'science',k:'8',q:'水に食塩を混ぜて大きく温度が下がるようにしたものを何という？',c:['氷水','寒剤','冷水','凍結液'],a:1,ex:'氷と食塩を混ぜて作る。0℃より冷たくなる。'},
+  {s:'science',k:'8',q:'水は何℃になると凍り始める？',c:['−10℃','−5℃','0℃','5℃'],a:2,ex:'氷と水の境界温度。'},
+  {s:'science',k:'8',q:'水が水蒸気になると体積はおよそ何倍になる？',c:['約16倍','約160倍','約1600倍','約16000倍'],a:2,ex:'液体から気体への変化で体積が大幅に増加。'},
+  {s:'science',k:'8',q:'固体・液体・気体をまとめて何という？',c:['状態','すがた','形態','変化'],a:1,ex:'物質の三つの状態を表す言葉。'},
+
+  // 理科第9回 光
+  {s:'science',k:'9',q:'光がまっすぐに進む性質を何という？',c:['光の屈折','光の反射','光の直進','光の散乱'],a:2,ex:'光が直線に進む性質。影ができる理由。'},
+  {s:'science',k:'9',q:'ピンホールカメラで、ひらがなの「あ」と書いたカードを映すと、どのように見える？',c:['そのまま「あ」','左右が反対','上下が反対','上下左右が反対'],a:3,ex:'ピンホールカメラでは像が上下左右反対になる。'},
+  {s:'science',k:'9',q:'光が鏡などにはね返される性質を何という？',c:['光の屈折','光の反射','光の直進','光の集合'],a:1,ex:'入射角＝反射角の法則がある。'},
+  {s:'science',k:'9',q:'鏡に光を当てるとき、入射角と反射角の関係は？',c:['入射角の方が大きい','反射角の方が大きい','いつも同じ大きさ','場合による'],a:2,ex:'反射の法則。入射角＝反射角。'},
+  {s:'science',k:'9',q:'鏡から5m離れて立つと、自分の像は鏡から何m離れた位置にできる？',c:['2.5m','5m','10m','15m'],a:1,ex:'鏡を境に対称な位置に像ができる。'},
+  {s:'science',k:'9',q:'光が性質の違う物の中へ進むとき、境目で曲がることを何という？',c:['光の屈折','光の反射','光の直進','光の分散'],a:0,ex:'空気から水、水から空気など。進む方向が変わる。'},
+  {s:'science',k:'9',q:'虫めがねで太陽の光が集まる点を何という？',c:['光点','集光点','焦点','中心点'],a:2,ex:'レンズの中心から焦点までの距離が焦点距離。'},
+
+  // 社会第8回 地図の見方
+  {s:'social',k:'8',q:'海面から同じ高さのところを結んだ線を何という？',c:['水平線','等高線','基準線','海岸線'],a:1,ex:'地図で高さを表す大切な線。'},
+  {s:'social',k:'8',q:'等高線の間隔が狭いところは、土地のかたむきはどうなっている？',c:['ゆるやか','普通','急','平ら'],a:2,ex:'間隔が狭い＝急斜面、間隔が広い＝ゆるやか。'},
+  {s:'social',k:'8',q:'土地の高さは、どこを基準にしている？',c:['山の頂上','平地','海面','川面'],a:2,ex:'海抜○mという表現の基準。'},
+  {s:'social',k:'8',q:'土地を真上から見た図を何という？',c:['断面図','側面図','平面図','立面図'],a:2,ex:'上から見下ろした図。地図の基本。'},
+  {s:'social',k:'8',q:'実際の長さを縮めた割合のことを何という？',c:['倍率','縮尺','比率','規模'],a:1,ex:'地図上の距離と実際の距離の比。'},
+  {s:'social',k:'8',q:'縮尺25000分の1の地図で、地図上3cmは実際に何m？',c:['250m','750m','2500m','7500m'],a:1,ex:'3cm×25000＝75000cm＝750m'},
+
+  // 社会第9回 沖縄
+  {s:'social',k:'9',q:'沖縄県の県庁所在地は？',c:['石垣市','宜野湾市','浦添市','那覇市'],a:3,ex:'沖縄本島にある県庁所在地。'},
+  {s:'social',k:'9',q:'九州と台湾の間に約1200kmにわたって続く島々を何という？',c:['琉球諸島','南西諸島','沖縄諸島','離島群'],a:1,ex:'沖縄県を含む島々の総称。'},
+  {s:'social',k:'9',q:'日本の西の果てにある島は？',c:['石垣島','宮古島','与那国島','久米島'],a:2,ex:'日本最西端の島。台湾に近い。'},
+  {s:'social',k:'9',q:'沖縄の1月の平均気温は約何℃？',c:['12℃','15℃','17℃','20℃'],a:2,ex:'一年中暖かい沖縄の気候。'},
+  {s:'social',k:'9',q:'台風の強い風対策として屋根にのせてある重いものは？',c:['石','かわら','コンクリート','砂袋'],a:1,ex:'赤いかわらが沖縄の特色。風対策。'},
+  {s:'social',k:'9',q:'水不足対策として沖縄の家の屋根にあるものは？',c:['太陽光パネル','給水タンク','アンテナ','風車'],a:1,ex:'水をためておくタンク。白いタンクが特徴的。'},
+  {s:'social',k:'9',q:'沖縄で栽培が盛んで砂糖の原料となる作物は？',c:['サトウキビ','サトウダイコン','テンサイ','アワ'],a:0,ex:'砂糖の原料。沖縄の代表的作物。'},
+  {s:'social',k:'9',q:'約600年前〜約140年前に沖縄にあった王国は？',c:['沖縄王国','南国王国','琉球王国','島王国'],a:2,ex:'首里城があった独立した王国。'},
+
+  // 国語 同訓異字
+  {s:'japanese',k:'all',q:'気温が高い「あつい」の漢字は？',c:['熱い','厚い','暑い','篤い'],a:2,ex:'天気や気候→暑い、物の温度→熱い'},
+  {s:'japanese',k:'all',q:'扉を「あける」の漢字は？',c:['開ける','明ける','空ける','上ける'],a:0,ex:'扉→開ける、席や場所→空ける'},
+  {s:'japanese',k:'all',q:'夢から「さめる」の漢字は？',c:['冷める','覚める','醒める','褪める'],a:1,ex:'眠り→覚める、温度→冷める'},
+  {s:'japanese',k:'all',q:'病気を「なおす」の漢字は？',c:['直す','治す','修す','正す'],a:1,ex:'まっすぐ→直す、病気→治す'},
+  {s:'japanese',k:'all',q:'敵を「おう」の漢字は？',c:['追う','負う','王う','応う'],a:0,ex:'後を→追う、背中に→負う'},
+
+  // 国語 漢字確認
+  {s:'japanese',k:'all',q:'「にんき」を漢字で書くと？',c:['任期','人気','人器','認起'],a:1,ex:'みんなに愛されること'},
+  {s:'japanese',k:'all',q:'「せいかく」を漢字で書くと？',c:['性格','正確','成果','精確'],a:1,ex:'正しくて確実なこと'},
+  {s:'japanese',k:'all',q:'「かんさつ」を漢字で書くと？',c:['監察','観察','感察','簡察'],a:1,ex:'よく見て調べること'},
+  {s:'japanese',k:'all',q:'「さんこう」を漢字で書くと？',c:['参考','散光','賛功','算考'],a:0,ex:'判断の材料にすること'},
+  {s:'japanese',k:'all',q:'「いんさつ」を漢字で書くと？',c:['印刷','隠薩','院薩','因薩'],a:0,ex:'本や新聞を刷ること'},
+];
+
+let cdeck=[...allCards],cidx=0,cflipped=false,cok=new Set(),csub='all',ckari='all';
+
+function setSubj(s,el){
+  csub=s;
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('on'));el.classList.add('on');
+  updateDeck();
+}
+
+function setKari(k,el){
+  ckari=k;
+  document.querySelectorAll('.ktab').forEach(t=>t.classList.remove('on'));el.classList.add('on');
+  updateDeck();
+}
+
+function updateDeck(){
+  cdeck=allCards.filter(c=>{
+    const subjMatch=csub==='all'||c.s===csub;
+    const kariMatch=ckari==='all'||c.k===ckari||c.k==='all';
+    return subjMatch&&kariMatch;
+  });
+  cidx=0;cok=new Set();
+  document.getElementById('ccomplete').style.display='none';
+  document.getElementById('cardwrap').style.display='block';
+  document.getElementById('ctr').style.display='block';
+  document.querySelector('.pbar-wrap').style.display='block';
+  showCard();
+}
+
+function showCard(){
+  if(!cdeck.length){
+    document.getElementById('cqtext').textContent='該当する問題がありません';
+    document.getElementById('cbadge').textContent='なし';
+    document.getElementById('ctaphint').textContent='';
+    document.getElementById('catext').textContent='';
+    document.getElementById('chint').textContent='';
+    return;
+  }
+  cflipped=false;
+  document.getElementById('cback').classList.remove('show');
+  document.getElementById('jrow').classList.remove('show');
+  const c=cdeck[cidx];
+  const sl={science:'🔬 理科',social:'🗾 社会',japanese:'✏️ 国語'};
+  const kl={8:'第8回',9:'第9回',all:'全範囲'};
+  document.getElementById('cbadge').textContent=(sl[c.s]||c.s)+' '+(kl[c.k]||'');
+  document.getElementById('cqtext').textContent=c.q;
+  document.getElementById('catext').textContent=c.a;
+  document.getElementById('chint').textContent=c.hint||'';
+  const cc=document.getElementById('ccaut');
+  if(c.caut){cc.textContent=c.caut;cc.style.display='block';}else{cc.style.display='none';}
+  document.getElementById('ctr').textContent=(cidx+1)+' / '+cdeck.length;
+  document.getElementById('cpfill').style.width=Math.round(cok.size/cdeck.length*100)+'%';
+}
+
+document.getElementById('thecard').onclick=function(){
+  if(!cflipped){cflipped=true;document.getElementById('cback').classList.add('show');document.getElementById('jrow').classList.add('show');}
+};
+
+function judge(ok){if(ok)cok.add(cidx);cnext();}
+function cnext(){if(cidx<cdeck.length-1){cidx++;showCard();}else{showComplete2();}}
+function cprev(){if(cidx>0){cidx--;showCard();}}
+function cshuffle(){
+  for(let i=cdeck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cdeck[i],cdeck[j]]=[cdeck[j],cdeck[i]];}
+  cidx=0;cok=new Set();showCard();
+}
+function showComplete2(){
+  document.getElementById('cardwrap').style.display='none';
+  document.getElementById('jrow').classList.remove('show');
+  document.getElementById('ctr').style.display='none';
+  document.querySelector('.pbar-wrap').style.display='none';
+  document.getElementById('ccomplete').style.display='block';
+  document.getElementById('cscmsg').textContent=cdeck.length+'問中'+cok.size+'問わかった！（'+Math.round(cok.size/cdeck.length*100)+'%）';
+}
+function crestart(){
+  cidx=0;cok=new Set();
+  document.getElementById('ccomplete').style.display='none';
+  document.getElementById('cardwrap').style.display='block';
+  document.getElementById('ctr').style.display='block';
+  document.querySelector('.pbar-wrap').style.display='block';
+  showCard();
+}
+
+let tpq=20,qsub='all',curQ=0,qscore=0,cor=0,wrg=0,tout=0,tInt=null,tLeft=20,qanswered=false,wrongItems=[],shuffledQ=[];
+
+function selMode(el,t){document.querySelectorAll('.mcard').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');tpq=t;}
+function selSf(el,s){document.querySelectorAll('.sf').forEach(b=>b.classList.remove('on'));el.classList.add('on');qsub=s;}
+
+function startQuiz(){
+  const pool=qsub==='all'?allQuiz:allQuiz.filter(q=>q.s===qsub);
+  shuffledQ=[...pool].sort(()=>Math.random()-0.5);
+  curQ=0;qscore=0;cor=0;wrg=0;tout=0;wrongItems=[];
+  document.getElementById('qstart').style.display='none';
+  document.getElementById('qresult').style.display='none';
+  document.getElementById('qmain').style.display='block';
+  loadQ();
+}
+
+function loadQ(){
+  if(curQ>=shuffledQ.length){showResult();return;}
+  const q=shuffledQ[curQ];qanswered=false;
+  document.getElementById('qfb').textContent='';document.getElementById('qfb').className='';
+  document.getElementById('qexplain').textContent='';document.getElementById('qexplain').style.display='none';
+  const sl={science:'🔬理科',social:'🗾社会',japanese:'✏️国語'};
+  document.getElementById('qstag').textContent=sl[q.s]||q.s;
+  document.getElementById('qqtext').textContent=q.q;
+  document.getElementById('qcnt').textContent=(curQ+1)+'/'+shuffledQ.length;
+  document.getElementById('slive').textContent=qscore+'点';
+  document.getElementById('qpfill').style.width=Math.round(curQ/shuffledQ.length*100)+'%';
+  const ch=document.getElementById('qchoices');ch.innerHTML='';
+  const shuffled=q.c.map((c,i)=>({text:c,idx:i})).sort(()=>Math.random()-0.5);
+  shuffled.forEach(({text,idx})=>{const b=document.createElement('button');b.className='choice2';b.textContent=text;b.onclick=()=>answerQ(idx);ch.appendChild(b);});
+  clearInterval(tInt);
+  if(tpq>0){tLeft=tpq;updT();tInt=setInterval(()=>{tLeft--;updT();if(tLeft<=0){clearInterval(tInt);onTO();}},1000);}
+  else{document.getElementById('tnum').textContent='∞';document.getElementById('tnum').className='tnum2';}
+}
+
+function updT(){const el=document.getElementById('tnum');el.textContent=tLeft;el.className='tnum2'+(tLeft<=5?' warn':'');}
+
+function answerQ(i){
+  if(qanswered)return;qanswered=true;clearInterval(tInt);
+  const q=shuffledQ[curQ];
+  document.querySelectorAll('.choice2').forEach((b,j)=>{
+    const isCorrect=shuffled.find(s=>s.text===b.textContent)?.idx===q.a;
+    const isSelected=shuffled.find(s=>s.text===b.textContent)?.idx===i;
+    if(isCorrect)b.classList.add('correct');
+    else if(isSelected)b.classList.add('wrong');
+    else b.classList.add('disabled');
+  });
+  if(i===q.a){
+    const pts=tpq>0?Math.max(10,Math.round(tLeft/tpq*100)):100;
+    qscore+=pts;cor++;
+    document.getElementById('qfb').textContent='⭕ 正解！ ＋'+pts+'点';
+    document.getElementById('qfb').style.color='var(--ok)';
+  }else{
+    wrg++;wrongItems.push(q);
+    document.getElementById('qfb').textContent='❌ まちがい！';
+    document.getElementById('qfb').style.color='var(--ng)';
+  }
+  document.getElementById('qexplain').textContent=q.ex||'';
+  document.getElementById('qexplain').style.display='block';
+  setTimeout(()=>{curQ++;loadQ();},2000);
+}
+
+function onTO(){
+  if(qanswered)return;qanswered=true;tout++;
+  const q=shuffledQ[curQ];wrongItems.push(q);
+  document.querySelectorAll('.choice2').forEach((b,i)=>{
+    const isCorrect=shuffled.find(s=>s.text===b.textContent)?.idx===q.a;
+    if(isCorrect)b.classList.add('correct');else b.classList.add('disabled');
+  });
+  document.getElementById('qfb').textContent='⏱ 時間切れ！';
+  document.getElementById('qfb').style.color='var(--ng)';
+  document.getElementById('qexplain').textContent=q.ex||'';
+  document.getElementById('qexplain').style.display='block';
+  setTimeout(()=>{curQ++;loadQ();},2000);
+}
+
+function showResult(){
+  document.getElementById('qmain').style.display='none';document.getElementById('qresult').style.display='block';
+  const total=shuffledQ.length,pct=Math.round(cor/total*100);
+  let emoji='😓',msg='もう一度チャレンジ！';
+  if(pct>=90){emoji='🏆';msg='完璧！本当にすごい！';}else if(pct>=70){emoji='🎉';msg='よくがんばった！';}else if(pct>=50){emoji='😊';msg='もう少し！';}
+  document.getElementById('remoji').textContent=emoji;
+  document.getElementById('rscore').textContent=qscore+'点';
+  document.getElementById('rmsg').textContent=pct+'%正解　'+msg;
+  document.getElementById('rcor').textContent=cor;
+  document.getElementById('rwrong').textContent=wrg;
+  document.getElementById('rtime').textContent=tout;
+  if(wrongItems.length>0){
+    document.getElementById('wlist').style.display='block';
+    document.getElementById('witems').innerHTML=wrongItems.map(w=>'<div class="witem"><div class="wq">Q: '+w.q.replace(/\n/g,' ')+'</div><div class="wa">A: '+w.c[w.a]+'</div></div>').join('');
+  }
+}
+
+function restartQuiz(){document.getElementById('qresult').style.display='none';startQuiz();}
+function backToStart(){document.getElementById('qresult').style.display='none';document.getElementById('qmain').style.display='none';document.getElementById('qstart').style.display='block';}
+
+function switchTop(id,el){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.ttab').forEach(t=>t.classList.remove('on'));el.classList.add('on');
+}
+
+let shuffled=[];
+showCard();
+</script>
+</body>
+</html>
