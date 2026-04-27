@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>組み分けテスト（5月）対策クイズ</title>
+<style>
+:root{--bg:#f5f4f0;--card:#fff;--border:#e2ddd6;--border2:#c8c2b8;--text:#1a1a18;--text2:#6b6760;--text3:#a8a49f;--green:#1D9E75;--green-bg:#E1F5EE;--green-text:#085041;--red:#C0392B;--red-bg:#FDEDEC;--red-text:#5B1A1A;--blue:#2563eb;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+#app{max-width:620px;margin:0 auto;padding:1rem;}
+.top{padding:1.5rem 0 1rem;}
+.top-title{font-size:22px;font-weight:700;line-height:1.4;margin-bottom:4px;}
+.top-sub{font-size:13px;color:var(--text2);margin-bottom:1.25rem;}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem;}
+.fbtn{border:1.5px solid var(--border2);border-radius:20px;padding:6px 15px;font-size:13px;cursor:pointer;background:white;color:var(--text2);font-family:inherit;transition:all .15s;}
+.fbtn:hover{background:var(--bg);}
+.fbtn.on{background:var(--text);color:white;border-color:var(--text);}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.mcard{border:1.5px solid var(--border);border-radius:16px;padding:1.4rem 1.2rem;cursor:pointer;background:white;transition:all .15s;text-align:left;}
+.mcard:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.08);}
+.mcard-icon{font-size:30px;margin-bottom:8px;}
+.mcard-title{font-size:15px;font-weight:700;margin-bottom:5px;}
+.mcard-desc{font-size:12px;color:var(--text2);line-height:1.7;}
+.count-note{font-size:12px;color:var(--text3);text-align:center;margin-top:.5rem;}
+.card-screen{display:flex;flex-direction:column;padding-bottom:2rem;}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 0;margin-bottom:.5rem;}
+.back-btn{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text2);padding:4px 8px;}
+.header-info{font-size:13px;color:var(--text2);}
+.prog-bar-wrap{background:var(--border);border-radius:4px;height:4px;margin-bottom:1rem;}
+.prog-bar{height:4px;border-radius:4px;background:var(--green);transition:width .3s;}
+.sbadge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:.6rem;}
+.sbadge-kokugo{background:#ede9fe;color:#5b21b6;}
+.sbadge-rika{background:#d1fae5;color:#065f46;}
+.sbadge-shakai{background:#fef3c7;color:#92400e;}
+.section-name{font-size:11px;color:var(--text3);margin-bottom:.4rem;}
+.c-card{background:white;border:1.5px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:.75rem;min-height:120px;display:flex;flex-direction:column;justify-content:center;}
+.c-card-answer{background:var(--green-bg);border-color:var(--green);}
+.c-q{font-size:16px;line-height:1.85;color:var(--text);text-align:center;}
+.c-a{font-size:22px;font-weight:700;color:var(--green-text);text-align:center;line-height:1.5;margin-top:.5rem;}
+.c-fig{margin:.5rem 0;overflow-x:auto;display:flex;justify-content:center;}
+.c-exp{background:#fefce8;border:1.5px solid #fde047;border-radius:12px;padding:.9rem 1rem;font-size:13px;line-height:1.75;color:#713f12;margin-bottom:.75rem;}
+.hint-row{font-size:12px;color:var(--text3);text-align:center;margin-bottom:.6rem;}
+.action-row{display:flex;gap:10px;margin-bottom:.75rem;}
+.action-btn{flex:1;border:1.5px solid var(--border2);border-radius:12px;padding:12px 8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;}
+.btn-again{background:var(--red-bg);color:var(--red);border-color:var(--red);}
+.btn-ok{background:var(--green-bg);color:var(--green-text);border-color:var(--green);}
+.btn-hint{background:#EFF6FF;color:#1d4ed8;border-color:#93c5fd;}
+.btn-reveal{background:#f5f4f0;color:var(--text);border-color:var(--border2);}
+.nav-row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-top:1rem;}
+.nav-btn{border:1.5px solid var(--border2);border-radius:12px;padding:10px 16px;font-size:14px;cursor:pointer;background:white;color:var(--text);font-family:inherit;}
+.nav-btn:disabled{opacity:.35;cursor:default;}
+.shuffle-btn{border:1.5px solid var(--border2);border-radius:12px;padding:10px 14px;font-size:14px;cursor:pointer;background:white;color:var(--text2);font-family:inherit;}
+.dots-wrap{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin:.75rem 0;}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--border);cursor:pointer;transition:all .15s;}
+.dot.current{background:var(--blue);transform:scale(1.3);}
+.dot.ok-dot{background:var(--green);}
+.dot.again-dot{background:var(--red);}
+.choices{display:grid;grid-template-columns:1fr;gap:8px;}
+.cbtn{background:white;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;cursor:pointer;color:var(--text);text-align:left;line-height:1.5;font-family:inherit;}
+.cbtn.correct{background:var(--green-bg);border-color:var(--green);color:var(--green-text);}
+.cbtn.wrong{background:var(--red-bg);border-color:var(--red);color:var(--red-text);}
+.cbtn.reveal{background:var(--green-bg);border-color:var(--green);color:var(--green-text);}
+.cbtn:disabled{cursor:default;}
+.fb{margin-top:.75rem;font-size:13px;padding:9px 13px;border-radius:10px;display:none;line-height:1.6;}
+.fb.show{display:block;}
+.fb.ok{background:var(--green-bg);color:var(--green-text);}
+.fb.ng{background:var(--red-bg);color:var(--red-text);}
+.complete-box{background:white;border:1.5px solid var(--border);border-radius:14px;padding:1.25rem;text-align:center;margin-top:1rem;}
+.attack-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 0;margin-bottom:.5rem;}
+.timer-box{font-size:22px;font-weight:700;min-width:50px;text-align:center;}
+.timer-box.warn{color:var(--red);}
+.atbar-wrap{background:var(--border);border-radius:3px;height:3px;margin-bottom:1rem;}
+.atbar{height:3px;border-radius:3px;background:var(--blue);transition:width .1s linear;}
+.qcard{background:white;border:1.5px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1rem;}
+.qtext{font-size:15px;line-height:1.85;margin-bottom:1rem;}
+.qfig{margin:.5rem 0 .75rem;overflow-x:auto;}
+.anav{display:flex;justify-content:flex-end;margin-top:.75rem;}
+.anext{background:var(--text);color:white;border:none;border-radius:10px;padding:10px 24px;font-size:14px;cursor:pointer;font-family:inherit;display:none;}
+.anext.show{display:block;}
+.result{text-align:center;padding:2rem .5rem;}
+.result-big{font-size:58px;font-weight:700;line-height:1;}
+.result-of{font-size:18px;color:var(--text2);}
+.result-comment{font-size:18px;margin:1rem 0 1.5rem;}
+.bd-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:1.5rem;}
+.bd-card{background:white;border:1.5px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;}
+.bd-label{font-size:11px;color:var(--text2);margin-bottom:4px;}
+.bd-score{font-size:22px;font-weight:700;}
+.wrong-list{text-align:left;background:white;border:1.5px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:1.5rem;}
+.wrong-list h3{font-size:13px;color:var(--text2);margin-bottom:.75rem;}
+.wrong-item{font-size:13px;padding:.5rem 0;border-bottom:1px solid var(--border);line-height:1.6;}
+.wrong-item:last-child{border-bottom:none;}
+.wrong-ans{color:var(--green-text);font-weight:600;}
+.rbtn-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.rbtn{border:1.5px solid var(--border2);border-radius:10px;padding:10px 22px;font-size:14px;cursor:pointer;background:white;color:var(--text);font-family:inherit;}
+.rbtn.primary{background:var(--text);color:white;border-color:var(--text);}
+</style>
+</head>
+<body>
+<div id="app"><div id="root"></div></div>
+<script>
+(function() {
+
+var FIGS = {};
+FIGS['fig_kusse'] = '<svg viewBox="0 0 260 110" width="220" height="93" xmlns="http://www.w3.org/2000/svg"><text x="90" y="12" font-size="10" fill="#6b6760" text-anchor="middle">太陽の光</text><line x1="55" y1="16" x2="90" y2="46" stroke="#6b6760" stroke-width="1" stroke-dasharray="4,2"/><line x1="125" y1="16" x2="90" y2="46" stroke="#6b6760" stroke-width="1" stroke-dasharray="4,2"/><ellipse cx="90" cy="50" rx="16" ry="9" fill="none" stroke="#333" stroke-width="2"/><line x1="82" y1="59" x2="70" y2="88" stroke="#378ADD" stroke-width="1.5"/><line x1="90" y1="59" x2="90" y2="88" stroke="#333" stroke-width="2"/><line x1="98" y1="59" x2="110" y2="88" stroke="#378ADD" stroke-width="1.5"/><text x="90" y="44" font-size="9" fill="#6b6760" text-anchor="middle">虫めがね</text><text x="148" y="70" font-size="10" fill="#378ADD">←折れ曲がる</text><rect x="50" y="88" width="80" height="7" fill="none" stroke="#6b6760" stroke-width="1"/><text x="90" y="106" font-size="9" fill="#6b6760" text-anchor="middle">工作用紙</text></svg>';
+FIGS['fig_mado'] = '<svg viewBox="0 0 280 115" width="260" height="107" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="18" width="110" height="80" fill="#e8e8e8" stroke="#6b6760" stroke-width="1"/><circle cx="65" cy="55" r="28" fill="white" stroke="#6b6760" stroke-width="1"/><circle cx="65" cy="55" r="12" fill="#666"/><text x="65" y="108" font-size="10" fill="#333" text-anchor="middle">ア</text><rect x="155" y="18" width="110" height="80" fill="#e8e8e8" stroke="#6b6760" stroke-width="1"/><circle cx="210" cy="55" r="20" fill="#666"/><circle cx="210" cy="55" r="9" fill="white" stroke="#6b6760" stroke-width="1"/><text x="210" y="108" font-size="10" fill="#333" text-anchor="middle">イ</text></svg>';
+FIGS['fig_kage_abc'] = '<svg viewBox="0 0 280 180" width="260" height="167" xmlns="http://www.w3.org/2000/svg"><text x="140" y="14" font-size="10" fill="#6b6760" text-anchor="middle">棒の影の先の軌跡</text><line x1="140" y1="165" x2="140" y2="25" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,2"/><line x1="30" y1="110" x2="250" y2="110" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,2"/><text x="140" y="175" font-size="9" fill="#6b6760" text-anchor="middle">南</text><text x="18" y="112" font-size="9" fill="#6b6760">⑧</text><text x="252" y="112" font-size="9" fill="#6b6760">⑨</text><rect x="134" y="104" width="12" height="12" fill="none" stroke="#333" stroke-width="1.5"/><path d="M50,75 Q140,42 230,75" fill="none" stroke="#378ADD" stroke-width="2"/><text x="36" y="72" font-size="11" fill="#378ADD" font-weight="bold">A</text><line x1="45" y1="110" x2="235" y2="110" stroke="#1D9E75" stroke-width="2"/><text x="31" y="112" font-size="11" fill="#1D9E75" font-weight="bold">B</text><path d="M60,145 Q140,162 220,145" fill="none" stroke="#E24B4A" stroke-width="2"/><text x="46" y="143" font-size="11" fill="#E24B4A" font-weight="bold">C</text></svg>';
+FIGS['fig_sunrise'] = '<svg viewBox="0 0 290 105" width="270" height="105" xmlns="http://www.w3.org/2000/svg"><g transform="translate(5,8)"><rect x="0" y="0" width="80" height="90" fill="#f0f8ff" rx="3"/><circle cx="40" cy="68" r="16" fill="#FAEEDA" stroke="#EF9F27" stroke-width="1.5"/><rect x="0" y="52" width="80" height="38" fill="#8B7355" opacity="0.15"/><line x1="0" y1="52" x2="80" y2="52" stroke="#555" stroke-width="2"/><text x="2" y="48" font-size="7" fill="#555">地平線</text><text x="40" y="100" font-size="11" fill="#333" text-anchor="middle" font-weight="bold">ア</text></g><g transform="translate(105,8)"><rect x="0" y="0" width="80" height="90" fill="#f0f8ff" rx="3"/><circle cx="40" cy="52" r="16" fill="#FAEEDA" stroke="#EF9F27" stroke-width="1.5"/><rect x="0" y="52" width="80" height="38" fill="#8B7355" opacity="0.15"/><line x1="0" y1="52" x2="80" y2="52" stroke="#555" stroke-width="2"/><text x="40" y="100" font-size="11" fill="#6b6760" text-anchor="middle" font-weight="bold">イ</text></g><g transform="translate(205,8)"><rect x="0" y="0" width="80" height="90" fill="#f0f8ff" rx="3"/><circle cx="40" cy="32" r="16" fill="#FAEEDA" stroke="#EF9F27" stroke-width="1.5"/><rect x="0" y="52" width="80" height="38" fill="#8B7355" opacity="0.15"/><line x1="0" y1="52" x2="80" y2="52" stroke="#555" stroke-width="2"/><text x="40" y="100" font-size="11" fill="#6b6760" text-anchor="middle" font-weight="bold">ウ</text></g></svg>';
+FIGS['fig_taiyou'] = '<svg viewBox="0 0 300 165" width="280" height="154" xmlns="http://www.w3.org/2000/svg"><rect x="38" y="8" width="250" height="130" fill="none" stroke="#333" stroke-width="1"/><text x="22" y="138" font-size="8" fill="#6b6760" text-anchor="middle">0°</text><text x="22" y="92" font-size="8" fill="#6b6760" text-anchor="middle">40°</text><text x="22" y="46" font-size="8" fill="#6b6760" text-anchor="middle">80°</text><line x1="38" y1="138" x2="288" y2="138" stroke="#e2ddd6" stroke-width="0.5"/><line x1="38" y1="92" x2="288" y2="92" stroke="#e2ddd6" stroke-width="0.5"/><line x1="38" y1="46" x2="288" y2="46" stroke="#e2ddd6" stroke-width="0.5"/><text x="55" y="155" font-size="8" fill="#6b6760" text-anchor="middle">10時</text><text x="96" y="155" font-size="8" fill="#6b6760" text-anchor="middle">11時</text><text x="138" y="155" font-size="8" fill="#6b6760" text-anchor="middle">12時</text><text x="179" y="155" font-size="8" fill="#6b6760" text-anchor="middle">13時</text><text x="221" y="155" font-size="8" fill="#6b6760" text-anchor="middle">14時</text><text x="263" y="155" font-size="8" fill="#6b6760" text-anchor="middle">15時</text><circle cx="55" cy="92" r="4" fill="none" stroke="#378ADD" stroke-width="2"/><text x="51" y="86" font-size="8" fill="#378ADD">①</text><circle cx="96" cy="69" r="4" fill="none" stroke="#378ADD" stroke-width="2"/><text x="92" y="63" font-size="8" fill="#378ADD">②</text><circle cx="138" cy="52" r="4" fill="none" stroke="#378ADD" stroke-width="2"/><text x="134" y="46" font-size="8" fill="#378ADD">③</text><circle cx="179" cy="69" r="4" fill="none" stroke="#378ADD" stroke-width="2"/><text x="175" y="63" font-size="8" fill="#378ADD">④</text><circle cx="221" cy="92" r="4" fill="none" stroke="#378ADD" stroke-width="2"/><text x="217" y="86" font-size="8" fill="#378ADD">⑤</text><circle cx="263" cy="112" r="4" fill="none" stroke="#378ADD" stroke-width="2"/><text x="259" y="106" font-size="8" fill="#378ADD">⑥</text><polyline points="55,92 96,69 138,52 179,69 221,92 263,112" fill="none" stroke="#378ADD" stroke-width="1.5" stroke-dasharray="4,2"/><text x="165" y="163" font-size="8" fill="#6b6760" text-anchor="middle">南 ← 方位 → ◇</text></svg>';
+FIGS['fig_chizu'] = '<svg viewBox="0 0 300 100" width="280" height="93" xmlns="http://www.w3.org/2000/svg"><g transform="translate(10,10)"><text x="22" y="32" font-size="22" fill="#333" text-anchor="middle">⛩</text><text x="22" y="48" font-size="9" fill="#6b6760" text-anchor="middle">神社</text></g><g transform="translate(60,10)"><text x="22" y="32" font-size="22" fill="#333" text-anchor="middle">卍</text><text x="22" y="48" font-size="9" fill="#6b6760" text-anchor="middle">寺院</text></g><g transform="translate(108,14)"><circle cx="14" cy="14" r="12" fill="none" stroke="#333" stroke-width="1.5"/><text x="14" y="18" font-size="12" fill="#333" text-anchor="middle">文</text><text x="14" y="44" font-size="9" fill="#6b6760" text-anchor="middle">ア</text></g><g transform="translate(155,14)"><rect x="2" y="2" width="22" height="22" fill="none" stroke="#333" stroke-width="1.5"/><text x="13" y="17" font-size="12" fill="#333" text-anchor="middle">文</text><text x="13" y="44" font-size="9" fill="#6b6760" text-anchor="middle">イ</text></g><g transform="translate(200,14)"><line x1="13" y1="0" x2="13" y2="20" stroke="#333" stroke-width="2"/><line x1="3" y1="7" x2="23" y2="7" stroke="#333" stroke-width="2"/><circle cx="13" cy="22" r="5" fill="none" stroke="#333" stroke-width="1.5"/><text x="13" y="44" font-size="9" fill="#6b6760" text-anchor="middle">エ</text></g><g transform="translate(245,14)"><rect x="2" y="8" width="22" height="16" fill="none" stroke="#333" stroke-width="1.5"/><polygon points="13,2 2,8 24,8" fill="none" stroke="#333" stroke-width="1.5"/><text x="13" y="44" font-size="9" fill="#6b6760" text-anchor="middle">ウ</text></g></svg>';
+
+var ALL = [
+{subj:"国語",s:"漢字変換",q:"病気をナオす。（正しい漢字1字は？）",a:"治",cs:["治","直","癒","修"],fig:"",exp:""},
+{subj:"国語",s:"漢字変換",q:"時計をナオす。（正しい漢字1字は？）",a:"直",cs:["治","直","修","換"],fig:"",exp:""},
+{subj:"国語",s:"漢字変換",q:"先生にアう。（正しい漢字1字は？）",a:"会",cs:["会","合","逢","遇"],fig:"",exp:""},
+{subj:"国語",s:"漢字変換",q:"意見がアう。（正しい漢字1字は？）",a:"合",cs:["会","合","逢","遇"],fig:"",exp:""},
+{subj:"国語",s:"漢字変換",q:"責任をオう。（正しい漢字1字は？）",a:"負",cs:["負","追","背","担"],fig:"",exp:""},
+{subj:"国語",s:"漢字変換",q:"理想をオう。（正しい漢字1字は？）",a:"追",cs:["負","追","背","担"],fig:"",exp:""},
+{subj:"国語",s:"漢字変換",q:"五十メートルキョウソウで一着になった。（キョウソウの漢字は？）",a:"競走",cs:["競走","競争","協奏","強壮"],fig:"",exp:""},
+{subj:"国語",s:"漢字変換",q:"プリントをインサツする。（インサツの漢字は？）",a:"印刷",cs:["印刷","引率","飲酒","院卒"],fig:"",exp:""},
+{subj:"国語",s:"漢字変換",q:"ケンコウ診断を受ける。（ケンコウの漢字は？）",a:"健康",cs:["健康","権威","謙虚","顕光"],fig:"",exp:""},
+{subj:"国語",s:"漢字変換",q:"駅のカイサツの前で待ち合わせよう。（カイサツの漢字は？）",a:"改札",cs:["改札","解察","会察","回刷"],fig:"",exp:""},
+{subj:"国語",s:"漢字の成り立ち",q:"「草」はどの漢字の成り立ちですか？",a:"象形文字",cs:["象形文字","指事文字","会意文字","形声文字"],fig:"",exp:"象形文字は物の形をそのまま絵にして作った文字です。草・山・川・日・月なども象形文字です。"},
+{subj:"国語",s:"漢字の成り立ち",q:"「森」はどの漢字の成り立ちですか？",a:"会意文字",cs:["象形文字","指事文字","会意文字","形声文字"],fig:"",exp:"会意文字は意味を持つ漢字を組み合わせた文字です。「木」を3つ合わせて森となります。「明」（日＋月）も会意文字です。"},
+{subj:"国語",s:"漢字の成り立ち",q:"「下」はどの漢字の成り立ちですか？",a:"指事文字",cs:["象形文字","指事文字","会意文字","形声文字"],fig:"",exp:"指事文字は記号や点・線で意味を表した文字です。「下」は線の下に点を打って下の方向を表します。上・一・二・三なども指事文字です。"},
+{subj:"国語",s:"漢字の成り立ち",q:"「馬」はどの漢字の成り立ちですか？",a:"象形文字",cs:["象形文字","指事文字","会意文字","形声文字"],fig:"",exp:"「馬」は馬の姿をそのまま絵にした象形文字です。古代の甲骨文字では馬の頭・たてがみ・足などの形が見て取れます。"},
+{subj:"国語",s:"語句の意味",q:"「はにかむ」の意味は？",a:"恥ずかしがる",cs:["恥ずかしがる","驚く","怒る","悲しむ"],fig:"",exp:"「はにかむ」は恥ずかしそうにするという意味です。人前に出たり褒められたりして照れるようすを表します。"},
+{subj:"国語",s:"語句の意味",q:"「まぬがれる」の意味は？",a:"免れる・逃れる",cs:["免れる・逃れる","近づく","忘れる","集まる"],fig:"",exp:"「まぬがれる」は危険や災いなどをうまく逃れるという意味です。「難を免れる」のように、悪い状況をさけることができたときに使います。"},
+{subj:"国語",s:"語句の意味",q:"「たたずむ」の意味は？",a:"じっと立つ",cs:["じっと立つ","走り回る","考え込む","喜ぶ"],fig:"",exp:"「たたずむ」はその場にじっと立ち止まっているようすを表します。橋のほとりにたたずむ、のように動かずにしばらくそこにいるイメージです。"},
+{subj:"国語",s:"語句の意味",q:"「ねぎらう」の意味は？",a:"目下の者に感謝の言葉などをかける",cs:["目下の者に感謝の言葉などをかける","相手をしかる","励ます","命令する"],fig:"",exp:"「ねぎらう」は苦労した人に感謝やいたわりの言葉をかけることです。目上の人に対しては使いません。"},
+{subj:"国語",s:"漢和辞典",q:"接・拾・打・投 を漢和辞典順に並べると最後は？",a:"投",cs:["接","拾","打","投"],fig:"",exp:""},
+{subj:"国語",s:"漢和辞典",q:"門・間・問・聞 を漢和辞典順に並べると最後は？",a:"聞",cs:["門","間","問","聞"],fig:"",exp:""},
+{subj:"理科",s:"光の性質",q:"虫めがねを通った光が折れ曲がって進む現象を何といいますか？",a:"光の屈折",cs:["光の直進","光の反射","光の屈折"],fig:"fig_kusse",exp:"光が透明なものを通るときに折れ曲がる性質を屈折といいます。虫めがねは中央がふくらんでいるため光を屈折させて一点に集めます。"},
+{subj:"理科",s:"虫めがね・距離",q:"虫めがねと工作用紙の距離が2cmのとき、うつる形はア・イのどちら？",a:"ア",cs:["ア","イ"],fig:"fig_mado",exp:"距離が短い（焦点より近い）と光が一点に集まらず、明るい部分が広く大きくうつります。距離が長くなると暗い部分が広くなります。"},
+{subj:"理科",s:"虫めがね・焦点",q:"直径が同じ虫めがねで、ふくらみが大きくなると光が一点に集まる距離はどうなる？",a:"短くなる",cs:["長くなる","短くなる","変わらない"],fig:"",exp:"ふくらみが大きい（厚い）レンズほど光を大きく屈折させるため、より近い距離で一点に集まります。これを焦点距離が短いといいます。"},
+{subj:"理科",s:"ピンホールカメラ",q:"ピンホールカメラは光のどんな性質を利用していますか？",a:"光の直進",cs:["光の直進","光の反射","光の屈折"],fig:"",exp:"光はまっすぐ進む性質があります。ピンホールカメラでは小さな穴を通った光が直進し、スクリーンに上下左右が逆になった像をうつします。"},
+{subj:"理科",s:"太陽の高度グラフ",q:"グラフの①〜⑥のうち、太陽の高度が最も高いのはどれですか？",a:"③",cs:["①","③","⑥"],fig:"fig_taiyou",exp:"太陽は東から昇り南を通って西に沈みます。最も高くなるのは南を通る正午ごろで、グラフでは南に最も近い③が最高点です。"},
+{subj:"理科",s:"太陽の方位",q:"グラフで、◇にあてはまる方位は？（太陽は東→南→西と動く）",a:"北",cs:["東","西","南","北"],fig:"fig_taiyou",exp:"太陽は南の空を通るので観察者は南を向いて記録します。グラフの手前（南）の反対、奥側が北になります。◇は南の反対側なので北です。"},
+{subj:"理科",s:"南中",q:"太陽が真南にくることを何といいますか？",a:"南中",cs:["南中","日の出","日の入り","正午"],fig:"",exp:"太陽が真南にきて高度が最も高くなる瞬間を南中といいます。南中した時刻を南中時刻、そのときの高度を南中高度といいます。"},
+{subj:"理科",s:"南中の時刻",q:"太陽が真南にくる時刻の正しい説明は？",a:"東の地方ほど早く、西の地方ほど遅い",cs:["東の地方ほど早く、西の地方ほど遅い","西の地方ほど早く、東の地方ほど遅い","どの地方でも同じ"],fig:"",exp:"地球は西から東へ自転しているため、東の地方ほど太陽が先に南にきます。日本では東京の方が大阪より南中時刻が早くなります。"},
+{subj:"理科",s:"影の軌跡",q:"A〜Cのうち、冬至の日の記録はどれですか？（冬至は太陽の高度が最も低い日）",a:"C",cs:["A","B","C"],fig:"fig_kage_abc",exp:"太陽の高度が低いほど影は長くなります。冬至は1年で最も太陽が低いので影が最も長く、軌跡は下に弧を描くCになります。Aが夏至、Bが春分・秋分です。"},
+{subj:"理科",s:"影の方向",q:"秋分の日（B）に、影の先が動いた方向は⑧・⑨のどちら？",a:"⑧",cs:["⑧","⑨"],fig:"fig_kage_abc",exp:"太陽は東→南→西と動くので影はその反対の西→北→東と動きます。午前中は西側に影ができ、時間とともに東へ移動するので⑧（西から東）の方向です。"},
+{subj:"理科",s:"日の出",q:"日の出のしゅん間のようすとして正しいものは？（ア：地平線の下、イ：半分出ている、ウ：完全に出ている）",a:"ア",cs:["ア","イ","ウ"],fig:"fig_sunrise",exp:"日の出とは太陽が地平線から出始める瞬間のことです。まだ地平線の下にある状態（ア）が日の出の瞬間にあたります。"},
+{subj:"理科",s:"太陽の大きさ",q:"太陽の直径は地球の直径の約何倍ですか？",a:"約109倍",cs:["約4倍","約109倍","約400倍"],fig:"",exp:"太陽の直径は約140万kmで、地球の直径（約1.3万km）の約109倍もあります。また太陽は地球から約1億5000万km離れています。"},
+{subj:"理科",s:"水と氷",q:"水が氷になると体積はどうなりますか？",a:"約1.1倍にふえる",cs:["約1.1倍にふえる","約1600倍にふえる","変わらない"],fig:"",exp:"水が氷になると体積は約1.1倍（約10%）増えます。重さは変わりませんが体積が増えるため密度が小さくなり、氷は水に浮きます。"},
+{subj:"理科",s:"サクラ・開花前線",q:"開花前線からわかることとして正しいものは？",a:"南から北へと開花が移っていく",cs:["南から北へと開花が移っていく","北から南へと移っていく","どの地方でもほぼ同じ"],fig:"",exp:"開花前線は同じ日に花が咲き始める地点を結んだ線です。日本では暖かい南から先に咲き始め、時間とともに北へと移っていきます。"},
+{subj:"理科",s:"春の植物",q:"春になってから種子をまく植物はどれですか？",a:"キュウリ",cs:["キュウリ","チューリップ","アブラナ"],fig:"",exp:"キュウリは春（4〜5月）に種をまく夏野菜です。チューリップは秋に球根を植えます。アブラナは秋に種をまいて春に咲きます。"},
+{subj:"理科",s:"渡り鳥",q:"春に南の国から渡ってきて日本で産卵する渡り鳥は？",a:"ツバメ",cs:["ツバメ","オオタカ","カラス","ペンギン"],fig:"",exp:"ツバメは春に東南アジアなど南の国から渡ってきて日本で巣を作り産卵します。このような鳥を夏鳥といいます。"},
+{subj:"社会",s:"地図記号",q:"図の地図記号のうち、ア（丸の中に文）は何を表しますか？",a:"高等学校",cs:["高等学校","小学校","中学校","大学"],fig:"fig_chizu",exp:"丸の中に文の字が入った記号は高等学校を表します。四角の中に文が入っていると小・中学校です。形の違いで学校の種類を区別します。"},
+{subj:"社会",s:"地図記号",q:"図の地図記号のうち、ウ（家の形）は何を表しますか？",a:"老人ホーム",cs:["老人ホーム","神社","市役所","消防署"],fig:"fig_chizu",exp:"屋根のある家の形をした記号は老人ホームを表します。2006年に新しく作られた地図記号で、高齢化社会に合わせて追加されました。"},
+{subj:"社会",s:"地図記号",q:"図のエ（棒とプロペラの形）は何力発電の何車の記号？（漢字1字）",a:"風",cs:["風","水","火","電"],fig:"fig_chizu",exp:"風車の形をした記号は風力発電所を表します。2013年に新しく作られた地図記号です。"},
+{subj:"社会",s:"縮尺",q:"縮尺25000分の1の地図で、地図上2cmの実際の距離は？",a:"500m",cs:["50m","500m","5000m"],fig:"",exp:"縮尺25000分の1とは地図上1cmが実際の25000cmであることです。2cm × 25000 = 50000cm = 500mになります。"},
+{subj:"社会",s:"標高",q:"標高の基準となる場所はどこの海面ですか？",a:"東京湾の平均海面",cs:["東京湾の平均海面","太平洋の平均海面","大阪湾の平均海面"],fig:"",exp:"標高は東京湾の平均海面の高さを0mとして土地の高さを表したものです。この基準点は東京都千代田区の日本水準原点に記されています。"},
+{subj:"社会",s:"関東地方",q:"茨城県の県庁所在地はどこですか？",a:"水戸市",cs:["水戸市","つくば市","土浦市","日立市"],fig:"",exp:""},
+{subj:"社会",s:"関東地方",q:"栃木県の県庁所在地はどこですか？",a:"宇都宮市",cs:["宇都宮市","小山市","足利市","那須塩原市"],fig:"",exp:""},
+{subj:"社会",s:"関東地方",q:"関東地方で海に面していない内陸の県は？（全部選ぶと）",a:"群馬県・栃木県・埼玉県",cs:["群馬県・栃木県・埼玉県","群馬県・栃木県","埼玉県・山梨県","群馬県・埼玉県・茨城県"],fig:"",exp:""},
+{subj:"社会",s:"関東地方",q:"関東地方で人口が最も多い都県は？",a:"東京都",cs:["東京都","神奈川県","埼玉県","千葉県"],fig:"",exp:""},
+{subj:"社会",s:"関東地方",q:"千葉県は昔、何という国でしたか？",a:"下総・上総・安房",cs:["下総・上総・安房","武蔵","常陸","相模"],fig:"",exp:""},
+{subj:"社会",s:"中部地方",q:"長野県が接している地方として正しいものは？",a:"東北地方と関東地方",cs:["東北地方のみ","関東地方のみ","東北地方と関東地方"],fig:"",exp:"長野県は中部地方に属しますが、群馬県・埼玉県（関東）とも接しています。"},
+{subj:"社会",s:"中部地方",q:"愛知県の県庁所在地はどこですか？",a:"名古屋市",cs:["名古屋市","静岡市","浜松市","津市"],fig:"",exp:""},
+{subj:"社会",s:"中部地方",q:"昔「信濃」とよばれた国は、今の何県ですか？",a:"長野県",cs:["長野県","新潟県","石川県","岐阜県"],fig:"",exp:""},
+{subj:"社会",s:"中部地方",q:"石川県の県庁所在地はどこですか？",a:"金沢市",cs:["金沢市","福井市","富山市","輪島市"],fig:"",exp:""},
+{subj:"社会",s:"中部地方",q:"昔「甲斐」とよばれた国は、今の何県ですか？",a:"山梨県",cs:["山梨県","長野県","静岡県","岐阜県"],fig:"",exp:""},
+{subj:"社会",s:"中部地方",q:"富山県・石川県・福井県をまとめて何地方とよびますか？",a:"北陸地方",cs:["北陸地方","山陰地方","東海地方","甲信越地方"],fig:"",exp:""},
+{subj:"社会",s:"九州地方",q:"長崎県が陸続きで接している県はどこですか？",a:"佐賀県",cs:["佐賀県","福岡県","熊本県","大分県"],fig:"",exp:""},
+{subj:"社会",s:"九州地方",q:"福岡県の県庁所在地と、そこにある古くからの地域名は？",a:"福岡市・博多",cs:["福岡市・博多","北九州市・小倉","大牟田市・有明","久留米市・筑後"],fig:"",exp:""},
+{subj:"社会",s:"九州地方",q:"鹿児島県にある2つの大きな半島の名前は？",a:"薩摩半島と大隅半島",cs:["薩摩半島と大隅半島","島原半島と国東半島","志摩半島と知多半島","男鹿半島と津軽半島"],fig:"",exp:""},
+{subj:"社会",s:"九州地方",q:"大分県・宮崎県・熊本県・鹿児島県の4県すべてに接している県はどこ？",a:"熊本県",cs:["熊本県","福岡県","佐賀県","長崎県"],fig:"",exp:"熊本県は九州のほぼ中央に位置し、大分・宮崎・鹿児島・福岡・佐賀・長崎の6県と接しています。"},
+{subj:"社会",s:"沖縄",q:"沖縄県の県庁所在地はどこですか？",a:"那覇市",cs:["那覇市","高松市","大津市","名護市"],fig:"",exp:""},
+{subj:"社会",s:"沖縄",q:"東京から沖縄島までのおよその距離は？",a:"約1200km",cs:["約800km","約1200km","約1600km"],fig:"",exp:""},
+{subj:"社会",s:"沖縄",q:"沖縄がかつて何王国とよばれていましたか？",a:"琉球王国",cs:["琉球王国","伊予王国","筑後王国","薩摩王国"],fig:"",exp:""},
+{subj:"社会",s:"沖縄",q:"琉球王国の国王が住んでいた城はどこですか？",a:"首里城",cs:["首里城","姫路城","熊本城","名護城"],fig:"",exp:"首里城は那覇市にあり、2019年に火災で焼失しましたが、現在復元工事が進められています。"}
+];
+
+var mode = null;
+var filter = 'all';
+var qs = [];
+var idx = 0;
+var status = [];
+var cardStage = 'question';
+var choiceResult = null;
+var shuffledChoices = [];
+var timerInterval = null;
+var atScore = 0;
+var atWrong = [];
+var atSubScores = {};
+var atSubTotal = {};
+var R = document.getElementById('root');
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+}
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function getPool() {
+  if (filter === 'all') return ALL;
+  return ALL.filter(function(q) { return q.subj === filter; });
+}
+
+function badgeClass(subj) {
+  if (subj === '国語') return 'sbadge sbadge-kokugo';
+  if (subj === '理科') return 'sbadge sbadge-rika';
+  return 'sbadge sbadge-shakai';
+}
+
+// ===== RENDER TOP =====
+function showTop() {
+  clearInterval(timerInterval);
+  mode = null;
+  var pool = getPool();
+  var kn = ALL.filter(function(q){return q.subj==='国語';}).length;
+  var rn = ALL.filter(function(q){return q.subj==='理科';}).length;
+  var sn = ALL.filter(function(q){return q.subj==='社会';}).length;
+
+  var html = '<div class="top">';
+  html += '<div class="top-title">組み分けテスト（5月）<br>対策クイズ</div>';
+  html += '<div class="top-sub">国語・社会・理科 全' + ALL.length + '問</div>';
+  html += '<div class="filter-row">';
+  html += '<button class="fbtn' + (filter==='all'?' on':'') + '" id="fb-all">全科目（' + ALL.length + '）</button>';
+  html += '<button class="fbtn' + (filter==='国語'?' on':'') + '" id="fb-kokugo">✏️ 国語（' + kn + '）</button>';
+  html += '<button class="fbtn' + (filter==='理科'?' on':'') + '" id="fb-rika">🔬 理科（' + rn + '）</button>';
+  html += '<button class="fbtn' + (filter==='社会'?' on':'') + '" id="fb-shakai">🗾 社会（' + sn + '）</button>';
+  html += '</div>';
+  html += '<div class="mode-grid">';
+  html += '<div class="mcard" id="btn-card"><div class="mcard-icon">📚</div><div class="mcard-title">覚えるカード</div><div class="mcard-desc">カードをめくって答えを確認。「わかった！」「もう一度」で仕分け。前後に自由に移動できます。</div></div>';
+  html += '<div class="mcard" id="btn-attack"><div class="mcard-icon">⏱️</div><div class="mcard-title">タイムアタック</div><div class="mcard-desc">1問30秒！選択肢から選ぶ形式。スピード勝負で実力を試そう。</div></div>';
+  html += '</div>';
+  html += '<div class="count-note">' + pool.length + '問が出題されます</div>';
+  html += '</div>';
+  R.innerHTML = html;
+
+  document.getElementById('fb-all').addEventListener('click', function(){ filter='all'; showTop(); });
+  document.getElementById('fb-kokugo').addEventListener('click', function(){ filter='国語'; showTop(); });
+  document.getElementById('fb-rika').addEventListener('click', function(){ filter='理科'; showTop(); });
+  document.getElementById('fb-shakai').addEventListener('click', function(){ filter='社会'; showTop(); });
+  document.getElementById('btn-card').addEventListener('click', startCard);
+  document.getElementById('btn-attack').addEventListener('click', startAttack);
+}
+
+// ===== CARD MODE =====
+function startCard() {
+  qs = getPool().slice();
+  status = qs.map(function(){ return 'none'; });
+  idx = 0; cardStage = 'question'; choiceResult = null; shuffledChoices = [];
+  renderCard();
+}
+
+function renderCard() {
+  var q = qs[idx];
+  var tot = qs.length;
+  var okCount = 0; var againCount = 0;
+  for (var i = 0; i < status.length; i++) {
+    if (status[i]==='ok') okCount++;
+    else if (status[i]==='again') againCount++;
+  }
+
+  var html = '<div class="card-screen">';
+  html += '<div class="card-header">';
+  html += '<button class="back-btn" id="btn-back">←</button>';
+  html += '<div class="header-info">' + (idx+1) + ' / ' + tot + '　✅' + okCount + '　😓' + againCount + '</div>';
+  html += '</div>';
+  html += '<div class="prog-bar-wrap"><div class="prog-bar" style="width:' + Math.round((idx+1)/tot*100) + '%"></div></div>';
+
+  // dots
+  html += '<div class="dots-wrap" id="dots-wrap">';
+  for (var d = 0; d < qs.length; d++) {
+    var dcls = 'dot' + (d===idx?' current':'') + (status[d]==='ok'?' ok-dot':'') + (status[d]==='again'?' again-dot':'');
+    html += '<div class="' + dcls + '" data-idx="' + d + '"></div>';
+  }
+  html += '</div>';
+
+  html += '<span class="' + badgeClass(q.subj) + '">' + q.subj + '</span>';
+  html += '<div class="section-name">' + esc(q.s) + '</div>';
+
+  var figHtml = q.fig ? '<div class="c-fig">' + FIGS[q.fig] + '</div>' : '';
+
+  if (cardStage === 'question') {
+    html += '<div class="c-card">' + figHtml + '<div class="c-q">' + esc(q.q) + '</div></div>';
+    html += '<div class="hint-row">💡 まず自分で考えてみよう</div>';
+    html += '<div class="action-row">';
+    html += '<button class="action-btn btn-hint" id="btn-choices">🔢 4択にする</button>';
+    html += '<button class="action-btn btn-reveal" id="btn-answer">答えを見る</button>';
+    html += '</div>';
+
+  } else if (cardStage === 'choices') {
+    html += '<div class="c-card">' + figHtml + '<div class="c-q">' + esc(q.q) + '</div></div>';
+    html += '<div class="choices" style="margin:.75rem 0;">';
+    for (var ci = 0; ci < shuffledChoices.length; ci++) {
+      var c = shuffledChoices[ci];
+      var bcls = 'cbtn';
+      var bdis = '';
+      if (choiceResult) {
+        if (c === q.a) bcls += ' reveal';
+        else if (c === choiceResult && c !== q.a) bcls += ' wrong';
+        bdis = ' disabled';
+      }
+      html += '<button class="' + bcls + '" data-ci="' + ci + '"' + bdis + '>' + esc(c) + '</button>';
+    }
+    html += '</div>';
+    if (choiceResult) {
+      if (choiceResult === 'correct') html += '<div class="fb show ok">✓ 正解！</div>';
+      else html += '<div class="fb show ng">✗ 不正解。正解は「' + esc(q.a) + '」です。</div>';
+      html += '<div class="action-row" style="margin-top:.75rem;"><button class="action-btn btn-reveal" id="btn-answer">答えを確認する</button></div>';
+    }
+
+  } else { // answer
+    var badge = '';
+    if (choiceResult === 'correct') badge = '<div style="font-size:12px;color:var(--green-text);margin-bottom:.5rem;">✓ 4択で正解しました</div>';
+    else if (choiceResult === 'wrong') badge = '<div style="font-size:12px;color:var(--red);margin-bottom:.5rem;">✗ 4択で不正解でした</div>';
+    html += '<div class="c-card c-card-answer">' + figHtml + '<div class="c-q">' + esc(q.q) + '</div>' + badge + '<div class="c-a">✅ ' + esc(q.a) + '</div></div>';
+    if (q.exp) html += '<div class="c-exp">💡 ' + esc(q.exp) + '</div>';
+    html += '<div class="action-row">';
+    html += '<button class="action-btn btn-again" id="btn-again">😓 もう一度</button>';
+    html += '<button class="action-btn btn-ok" id="btn-ok">✅ わかった！</button>';
+    html += '</div>';
+  }
+
+  html += '<div class="nav-row">';
+  html += '<button class="nav-btn" id="btn-prev"' + (idx===0?' disabled':'') + '>← 前へ</button>';
+  html += '<div style="display:flex;justify-content:center;"><button class="shuffle-btn" id="btn-shuffle">🔀</button></div>';
+  html += '<button class="nav-btn" id="btn-next"' + (idx===tot-1?' disabled':'') + '>次へ →</button>';
+  html += '</div>';
+
+  if (okCount + againCount === tot) {
+    html += '<div class="complete-box">';
+    html += '<div style="font-size:14px;color:var(--text2);margin-bottom:.5rem;">全問チェック完了！</div>';
+    html += '<div>✅ わかった：<strong style="color:var(--green-text)">' + okCount + '</strong>問　😓 もう一度：<strong style="color:var(--red)">' + againCount + '</strong>問</div>';
+    html += '<div class="rbtn-row" style="margin-top:1rem;">';
+    html += '<button class="rbtn" id="btn-restart">もう一度</button>';
+    html += '<button class="rbtn primary" id="btn-retry">😓のみ再挑戦</button>';
+    html += '</div></div>';
+  }
+
+  html += '</div>';
+  R.innerHTML = html;
+
+  // attach events
+  document.getElementById('btn-back').addEventListener('click', showTop);
+  document.getElementById('btn-prev').addEventListener('click', prevQ);
+  document.getElementById('btn-next').addEventListener('click', nextQ);
+  document.getElementById('btn-shuffle').addEventListener('click', doShuffle);
+
+  var dotsWrap = document.getElementById('dots-wrap');
+  if (dotsWrap) {
+    dotsWrap.addEventListener('click', function(e) {
+      var di = e.target.getAttribute('data-idx');
+      if (di !== null) jumpTo(parseInt(di));
+    });
+  }
+
+  if (cardStage === 'question') {
+    document.getElementById('btn-choices').addEventListener('click', showChoices);
+    document.getElementById('btn-answer').addEventListener('click', showAnswer);
+  } else if (cardStage === 'choices') {
+    var cbtnList = document.querySelectorAll('.cbtn');
+    cbtnList.forEach(function(b) {
+      b.addEventListener('click', function() {
+        var ci = parseInt(this.getAttribute('data-ci'));
+        pickChoice(ci);
+      });
+    });
+    var ba = document.getElementById('btn-answer');
+    if (ba) ba.addEventListener('click', showAnswer);
+  } else {
+    var ba2 = document.getElementById('btn-again');
+    var bo = document.getElementById('btn-ok');
+    if (ba2) ba2.addEventListener('click', markAgain);
+    if (bo) bo.addEventListener('click', markOk);
+  }
+
+  var br = document.getElementById('btn-restart');
+  var bry = document.getElementById('btn-retry');
+  if (br) br.addEventListener('click', startCard);
+  if (bry) bry.addEventListener('click', retryAgain);
+}
+
+function showChoices() {
+  shuffledChoices = shuffle(qs[idx].cs.slice());
+  choiceResult = null;
+  cardStage = 'choices';
+  renderCard();
+}
+
+function pickChoice(ci) {
+  var c = shuffledChoices[ci];
+  choiceResult = (c === qs[idx].a) ? 'correct' : 'wrong';
+  renderCard();
+}
+
+function showAnswer() { cardStage = 'answer'; renderCard(); }
+function jumpTo(i) { idx = i; cardStage = 'question'; choiceResult = null; shuffledChoices = []; renderCard(); }
+function prevQ() { if (idx > 0) { idx--; cardStage = 'question'; choiceResult = null; shuffledChoices = []; renderCard(); } }
+function nextQ() { if (idx < qs.length-1) { idx++; cardStage = 'question'; choiceResult = null; shuffledChoices = []; renderCard(); } }
+
+function markOk() {
+  status[idx] = 'ok';
+  if (idx < qs.length-1) { idx++; cardStage = 'question'; choiceResult = null; shuffledChoices = []; }
+  renderCard();
+}
+function markAgain() {
+  status[idx] = 'again';
+  if (idx < qs.length-1) { idx++; cardStage = 'question'; choiceResult = null; shuffledChoices = []; }
+  renderCard();
+}
+function doShuffle() {
+  var combined = [];
+  for (var i = 0; i < qs.length; i++) combined.push({q:qs[i], s:status[i]});
+  combined = shuffle(combined);
+  qs = combined.map(function(c){return c.q;});
+  status = combined.map(function(c){return c.s;});
+  idx = 0; cardStage = 'question'; choiceResult = null; shuffledChoices = [];
+  renderCard();
+}
+function retryAgain() {
+  var wrongQs = [];
+  for (var i = 0; i < qs.length; i++) { if (status[i]==='again') wrongQs.push(qs[i]); }
+  if (wrongQs.length === 0) { alert('😓の問題はありません！'); return; }
+  qs = wrongQs;
+  status = qs.map(function(){ return 'none'; });
+  idx = 0; cardStage = 'question'; choiceResult = null; shuffledChoices = [];
+  renderCard();
+}
+
+// ===== ATTACK MODE =====
+function startAttack() {
+  qs = shuffle(getPool());
+  idx = 0; atScore = 0; atWrong = [];
+  atSubScores = {'国語':0,'理科':0,'社会':0};
+  atSubTotal = {'国語':0,'理科':0,'社会':0};
+  for (var i = 0; i < qs.length; i++) atSubTotal[qs[i].subj]++;
+  renderAttack();
+}
+
+function renderAttack() {
+  clearInterval(timerInterval);
+  if (idx >= qs.length) { showResult(); return; }
+  var q = qs[idx];
+  var tot = qs.length;
+  var sh = shuffle(q.cs.slice());
+  var figHtml = q.fig ? '<div class="qfig">' + FIGS[q.fig] + '</div>' : '';
+
+  var html = '<div class="card-screen">';
+  html += '<div class="attack-header">';
+  html += '<button class="back-btn" id="atk-back">←</button>';
+  html += '<span class="' + badgeClass(q.subj) + '">' + q.subj + '</span>';
+  html += '<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:13px;color:var(--text2)">' + (idx+1) + '/' + tot + '</span>';
+  html += '<div class="timer-box" id="timer">30s</div></div>';
+  html += '</div>';
+  html += '<div class="prog-bar-wrap"><div class="prog-bar" style="width:' + Math.round(idx/tot*100) + '%"></div></div>';
+  html += '<div class="atbar-wrap"><div class="atbar" id="atbar" style="width:100%"></div></div>';
+  html += '<div class="qcard">';
+  html += '<div class="section-name">' + esc(q.s) + '</div>';
+  html += '<div class="qtext">' + esc(q.q) + '</div>';
+  html += figHtml;
+  html += '<div class="choices" id="atk-choices">';
+  for (var ci = 0; ci < sh.length; ci++) {
+    html += '<button class="cbtn" data-val="' + esc(sh[ci]) + '" data-ci="' + ci + '">' + esc(sh[ci]) + '</button>';
+  }
+  html += '</div>';
+  html += '<div class="fb" id="atk-fb"></div>';
+  html += '</div>';
+  html += '<div class="anav"><button class="anext" id="atk-next">次の問題 →</button></div>';
+  html += '</div>';
+  R.innerHTML = html;
+
+  document.getElementById('atk-back').addEventListener('click', showTop);
+  document.getElementById('atk-next').addEventListener('click', function() { idx++; renderAttack(); });
+
+  var answered = false;
+  var qLeft = 30;
+
+  var cbtnList = document.querySelectorAll('#atk-choices .cbtn');
+  cbtnList.forEach(function(b) {
+    b.addEventListener('click', function() {
+      if (answered) return;
+      answered = true;
+      clearInterval(timerInterval);
+      var chosen = this.getAttribute('data-val');
+      var answer = qs[idx].a;
+      document.querySelectorAll('#atk-choices .cbtn').forEach(function(btn) {
+        btn.disabled = true;
+        if (btn.getAttribute('data-val') === answer) btn.classList.add('reveal');
+      });
+      var fb = document.getElementById('atk-fb');
+      if (chosen === answer) {
+        this.classList.remove('reveal');
+        this.classList.add('correct');
+        fb.textContent = '✓ 正解！'; fb.className = 'fb show ok';
+        atScore++; atSubScores[qs[idx].subj]++;
+      } else {
+        this.classList.add('wrong');
+        fb.textContent = '✗ 不正解。正解は「' + qs[idx].a + '」です。'; fb.className = 'fb show ng';
+        atWrong.push(qs[idx]);
+      }
+      document.getElementById('atk-next').className = 'anext show';
+    });
+  });
+
+  timerInterval = setInterval(function() {
+    qLeft--;
+    var tel = document.getElementById('timer');
+    var tbar = document.getElementById('atbar');
+    if (tel) { tel.textContent = qLeft + 's'; if (qLeft<=5) tel.className='timer-box warn'; }
+    if (tbar) tbar.style.width = (qLeft/30*100) + '%';
+    if (qLeft <= 0) {
+      clearInterval(timerInterval);
+      if (!answered) {
+        answered = true;
+        var answer = qs[idx].a;
+        document.querySelectorAll('#atk-choices .cbtn').forEach(function(b) {
+          b.disabled = true;
+          if (b.getAttribute('data-val') === answer) b.classList.add('reveal');
+        });
+        var fb = document.getElementById('atk-fb');
+        fb.textContent = '⏰ 時間切れ！正解は「' + answer + '」です。'; fb.className = 'fb show ng';
+        atWrong.push(qs[idx]);
+        document.getElementById('atk-next').className = 'anext show';
+      }
+    }
+  }, 1000);
+}
+
+function showResult() {
+  clearInterval(timerInterval);
+  var tot = qs.length;
+  var pct = Math.round(atScore/tot*100);
+  var comment = pct>=90?'🎉 すばらしい！':pct>=70?'👍 よくできました！':pct>=50?'📚 もう一息！':'💪 もっと練習しよう！';
+
+  var html = '<div class="result">';
+  html += '<div style="font-size:13px;color:var(--text2);margin-bottom:.5rem;">⏱️ タイムアタック 完了！</div>';
+  html += '<div class="result-big">' + atScore + '</div>';
+  html += '<div class="result-of">／' + tot + '問正解（' + pct + '%）</div>';
+  html += '<div class="result-comment">' + comment + '</div>';
+  html += '<div class="bd-grid">';
+  var subjs = ['国語','理科','社会'];
+  for (var i = 0; i < subjs.length; i++) {
+    var s = subjs[i];
+    html += '<div class="bd-card"><div class="bd-label">' + s + '</div><div class="bd-score">' + (atSubScores[s]||0) + '／' + (atSubTotal[s]||0) + '</div></div>';
+  }
+  html += '</div>';
+  if (atWrong.length > 0) {
+    html += '<div class="wrong-list"><h3>📝 間違えた問題（' + atWrong.length + '問）</h3>';
+    for (var j = 0; j < atWrong.length; j++) {
+      html += '<div class="wrong-item">' + esc(atWrong[j].q) + '<br><span class="wrong-ans">→ ' + esc(atWrong[j].a) + '</span></div>';
+    }
+    html += '</div>';
+  }
+  html += '<div class="rbtn-row">';
+  html += '<button class="rbtn" id="res-top">トップに戻る</button>';
+  html += '<button class="rbtn primary" id="res-retry">もう一度！</button>';
+  html += '</div></div>';
+  R.innerHTML = html;
+
+  document.getElementById('res-top').addEventListener('click', showTop);
+  document.getElementById('res-retry').addEventListener('click', startAttack);
+}
+
+showTop();
+
+})();
+</script>
+</body>
+</html>
