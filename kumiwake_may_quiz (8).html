@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>組み分けテスト（5月）対策クイズ</title>
+<style>
+:root{
+  --bg:#f5f4f0;--card:#fff;--border:#e2ddd6;--border2:#c8c2b8;
+  --text:#1a1a18;--text2:#6b6760;--text3:#a8a49f;
+  --green:#1D9E75;--green-bg:#E1F5EE;--green-text:#085041;
+  --red:#C0392B;--red-bg:#FDEDEC;--red-text:#5B1A1A;
+  --blue:#2563eb;--yellow:#f59e0b;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+#app{max-width:620px;margin:0 auto;padding:1rem;}
+
+/* ===== TOP ===== */
+.top{padding:1.5rem 0 1rem;}
+.top-title{font-size:22px;font-weight:700;line-height:1.4;margin-bottom:4px;}
+.top-sub{font-size:13px;color:var(--text2);margin-bottom:1.25rem;}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem;}
+.fbtn{border:1.5px solid var(--border2);border-radius:20px;padding:6px 15px;font-size:13px;cursor:pointer;background:white;color:var(--text2);font-family:inherit;transition:all .15s;}
+.fbtn:hover{background:var(--bg);}
+.fbtn.on{background:var(--text);color:white;border-color:var(--text);}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.mcard{border:1.5px solid var(--border);border-radius:16px;padding:1.4rem 1.2rem;cursor:pointer;background:white;transition:all .15s;text-align:left;}
+.mcard:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.08);}
+.mcard-icon{font-size:30px;margin-bottom:8px;}
+.mcard-title{font-size:15px;font-weight:700;margin-bottom:5px;}
+.mcard-desc{font-size:12px;color:var(--text2);line-height:1.7;}
+.count-note{font-size:12px;color:var(--text3);text-align:center;margin-top:.5rem;}
+
+/* ===== CARD MODE ===== */
+.card-screen{display:flex;flex-direction:column;min-height:100vh;padding-bottom:1rem;}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 0;margin-bottom:.5rem;}
+.back-btn{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text2);padding:4px 8px;}
+.header-info{font-size:13px;color:var(--text2);}
+.prog-bar-wrap{background:var(--border);border-radius:4px;height:4px;margin-bottom:1rem;}
+.prog-bar{height:4px;border-radius:4px;background:var(--green);transition:width .3s;}
+
+/* subj badge */
+.sbadge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:.6rem;}
+.sbadge-国語{background:#ede9fe;color:#5b21b6;}
+.sbadge-理科{background:#d1fae5;color:#065f46;}
+.sbadge-社会{background:#fef3c7;color:#92400e;}
+.section-name{font-size:11px;color:var(--text3);margin-bottom:.4rem;}
+
+/* flip card */
+.flip-wrap{perspective:1000px;margin-bottom:1rem;}
+.flip-inner{position:relative;width:100%;min-height:200px;transition:transform .5s;transform-style:preserve-3d;cursor:pointer;}
+.flip-inner.flipped{transform:rotateY(180deg);}
+.flip-front,.flip-back{position:absolute;width:100%;min-height:200px;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:16px;border:1.5px solid var(--border);background:white;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:1.5rem;text-align:center;}
+.flip-back{transform:rotateY(180deg);background:var(--green-bg);border-color:var(--green);}
+.flip-q{font-size:16px;line-height:1.8;color:var(--text);}
+.flip-hint{font-size:12px;color:var(--text3);margin-top:.75rem;}
+.flip-a{font-size:20px;font-weight:700;color:var(--green-text);line-height:1.6;}
+.flip-fig{margin:.75rem 0;overflow-x:auto;}
+.tap-hint{font-size:12px;color:var(--text3);text-align:center;margin-bottom:.75rem;}
+
+/* action buttons */
+.action-row{display:flex;gap:10px;margin-bottom:1rem;}
+.action-btn{flex:1;border:1.5px solid var(--border2);border-radius:12px;padding:12px 8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;}
+.btn-again{background:var(--red-bg);color:var(--red);border-color:var(--red);}
+.btn-again:hover{background:#fbd5d1;}
+.btn-ok{background:var(--green-bg);color:var(--green-text);border-color:var(--green);}
+.btn-ok:hover{background:#c5eed9;}
+
+/* nav buttons */
+.nav-row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;}
+.nav-btn{border:1.5px solid var(--border2);border-radius:12px;padding:10px 16px;font-size:14px;cursor:pointer;background:white;color:var(--text);font-family:inherit;transition:all .15s;}
+.nav-btn:hover:not(:disabled){background:var(--bg);}
+.nav-btn:disabled{opacity:.35;cursor:default;}
+.nav-center{display:flex;gap:8px;justify-content:center;}
+.shuffle-btn{border:1.5px solid var(--border2);border-radius:12px;padding:10px 14px;font-size:14px;cursor:pointer;background:white;color:var(--text2);font-family:inherit;transition:all .15s;}
+.shuffle-btn:hover{background:var(--bg);}
+
+/* status dots */
+.dots-wrap{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin:.75rem 0;}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--border);cursor:pointer;transition:all .15s;}
+.dot.current{background:var(--blue);transform:scale(1.3);}
+.dot.ok{background:var(--green);}
+.dot.again{background:var(--red);}
+.dot:hover{transform:scale(1.4);}
+
+/* ===== ATTACK MODE ===== */
+.attack-screen{display:flex;flex-direction:column;min-height:100vh;padding-bottom:1rem;}
+.attack-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 0;margin-bottom:.5rem;}
+.timer-box{font-size:22px;font-weight:700;min-width:50px;text-align:center;}
+.timer-box.warn{color:var(--red);}
+.atbar-wrap{background:var(--border);border-radius:3px;height:3px;margin-bottom:1rem;}
+.atbar{height:3px;border-radius:3px;background:var(--blue);transition:width .1s linear;}
+.qcard{background:white;border:1.5px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1rem;}
+.qtext{font-size:15px;line-height:1.85;margin-bottom:1rem;}
+.qfig{margin:.5rem 0 .75rem;overflow-x:auto;}
+.choices{display:grid;grid-template-columns:1fr;gap:8px;}
+.cbtn{background:white;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;cursor:pointer;color:var(--text);text-align:left;line-height:1.5;font-family:inherit;transition:all .12s;}
+.cbtn:hover:not(:disabled){background:var(--bg);}
+.cbtn.correct{background:var(--green-bg);border-color:var(--green);color:var(--green-text);}
+.cbtn.wrong{background:var(--red-bg);border-color:var(--red);color:var(--red-text);}
+.cbtn.reveal{background:var(--green-bg);border-color:var(--green);color:var(--green-text);}
+.cbtn:disabled{cursor:default;}
+.fb{margin-top:.75rem;font-size:13px;padding:9px 13px;border-radius:10px;display:none;line-height:1.6;}
+.fb.show{display:block;}
+.fb.ok{background:var(--green-bg);color:var(--green-text);}
+.fb.ng{background:var(--red-bg);color:var(--red-text);}
+.anav{display:flex;justify-content:flex-end;margin-top:.75rem;}
+.anext{background:var(--text);color:white;border:none;border-radius:10px;padding:10px 24px;font-size:14px;cursor:pointer;font-family:inherit;display:none;}
+.anext.show{display:block;}
+
+/* ===== RESULT ===== */
+.result{text-align:center;padding:2rem .5rem;}
+.result-big{font-size:58px;font-weight:700;line-height:1;}
+.result-of{font-size:18px;color:var(--text2);}
+.result-comment{font-size:18px;margin:1rem 0 1.5rem;}
+.bd-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:1.5rem;}
+.bd-card{background:white;border:1.5px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;}
+.bd-label{font-size:11px;color:var(--text2);margin-bottom:4px;}
+.bd-score{font-size:22px;font-weight:700;}
+.wrong-list{text-align:left;background:white;border:1.5px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:1.5rem;}
+.wrong-list h3{font-size:13px;color:var(--text2);margin-bottom:.75rem;}
+.wrong-item{font-size:13px;padding:.5rem 0;border-bottom:1px solid var(--border);line-height:1.6;}
+.wrong-item:last-child{border-bottom:none;}
+.wrong-item .wa{color:var(--green-text);font-weight:600;}
+.rbtn-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.rbtn{border:1.5px solid var(--border2);border-radius:10px;padding:10px 22px;font-size:14px;cursor:pointer;background:white;color:var(--text);font-family:inherit;transition:all .15s;}
+.rbtn:hover{background:var(--bg);}
+.rbtn.primary{background:var(--text);color:white;border-color:var(--text);}
+.rbtn.primary:hover{opacity:.85;}
+
+/* card stage styles */
+.c-card{background:white;border:1.5px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:.75rem;min-height:120px;display:flex;flex-direction:column;justify-content:center;}
+.c-card-answer{background:var(--green-bg);border-color:var(--green);}
+.c-q{font-size:16px;line-height:1.85;color:var(--text);text-align:center;}
+.c-a{font-size:22px;font-weight:700;color:var(--green-text);text-align:center;line-height:1.5;}
+.hint-row{font-size:12px;color:var(--text3);text-align:center;margin-bottom:.6rem;}
+.btn-hint{background:#EFF6FF;color:#1d4ed8;border-color:#93c5fd;}
+.btn-hint:hover{background:#dbeafe;}
+.btn-reveal{background:#f5f4f0;color:var(--text);border-color:var(--border2);}
+.btn-reveal:hover{background:#eceae4;}
+
+.c-exp{background:#fefce8;border:1.5px solid #fde047;border-radius:12px;padding:.9rem 1rem;font-size:13px;line-height:1.75;color:#713f12;margin-bottom:.75rem;}
+
+/* flip (legacy - keep for compatibility) */
+.flip-fig{margin:.5rem 0;overflow-x:auto;display:flex;justify-content:center;}
+</style>
+</head>
+<body>
+<div id="app"><div id="root"></div></div>
+<script>
+// ===== FIGURES =====
+const F={
+fig_kusse:`<svg viewBox="0 0 260 110" width="220" height="93" xmlns="http://www.w3.org/2000/svg"><text x="90" y="12" font-size="10" fill="#6b6760" text-anchor="middle">太陽の光</text><line x1="55" y1="16" x2="90" y2="46" stroke="#6b6760" stroke-width="1" stroke-dasharray="4,2"/><line x1="125" y1="16" x2="90" y2="46" stroke="#6b6760" stroke-width="1" stroke-dasharray="4,2"/><ellipse cx="90" cy="50" rx="16" ry="9" fill="none" stroke="#1a1a18" stroke-width="2"/><text x="90" y="44" font-size="9" fill="#6b6760" text-anchor="middle">虫めがね</text><line x1="82" y1="59" x2="70" y2="88" stroke="#378ADD" stroke-width="1.5"/><line x1="90" y1="59" x2="90" y2="88" stroke="#1a1a18" stroke-width="2"/><line x1="98" y1="59" x2="110" y2="88" stroke="#378ADD" stroke-width="1.5"/><text x="148" y="70" font-size="10" fill="#378ADD">← 折れ曲がる</text><rect x="50" y="88" width="80" height="7" fill="none" stroke="#6b6760" stroke-width="1"/><text x="90" y="106" font-size="9" fill="#6b6760" text-anchor="middle">工作用紙</text></svg>`,
+
+fig_mado:`<svg viewBox="0 0 280 115" width="260" height="107" xmlns="http://www.w3.org/2000/svg">
+<rect x="10" y="18" width="110" height="80" fill="#e8e8e8" stroke="#6b6760" stroke-width="1"/>
+<circle cx="65" cy="55" r="28" fill="white" stroke="#6b6760" stroke-width="1"/>
+<circle cx="65" cy="55" r="12" fill="#666"/>
+<text x="65" y="108" font-size="10" fill="#1a1a18" text-anchor="middle">ア</text>
+<rect x="155" y="18" width="110" height="80" fill="#e8e8e8" stroke="#6b6760" stroke-width="1"/>
+<circle cx="210" cy="55" r="20" fill="#666"/>
+<circle cx="210" cy="55" r="9" fill="white" stroke="#6b6760" stroke-width="1"/>
+<text x="210" y="108" font-size="10" fill="#1a1a18" text-anchor="middle">イ</text>
+</svg>`,
+
+fig_kage_abc:`<svg viewBox="0 0 280 180" width="260" height="167" xmlns="http://www.w3.org/2000/svg"><text x="140" y="14" font-size="10" fill="#6b6760" text-anchor="middle">棒の影の先の軌跡（東京）</text><line x1="140" y1="165" x2="140" y2="25" stroke="#c8c2b8" stroke-width="0.5" stroke-dasharray="3,2"/><line x1="30" y1="110" x2="250" y2="110" stroke="#c8c2b8" stroke-width="0.5" stroke-dasharray="3,2"/><text x="140" y="175" font-size="9" fill="#6b6760" text-anchor="middle">南</text><text x="18" y="112" font-size="9" fill="#6b6760">⑧</text><text x="252" y="112" font-size="9" fill="#6b6760">⑨</text><rect x="134" y="104" width="12" height="12" fill="none" stroke="#1a1a18" stroke-width="1.5"/><path d="M50,75 Q140,42 230,75" fill="none" stroke="#378ADD" stroke-width="2"/><text x="36" y="73" font-size="11" fill="#378ADD" font-weight="bold">A</text><line x1="45" y1="110" x2="235" y2="110" stroke="#1D9E75" stroke-width="2"/><text x="31" y="112" font-size="11" fill="#1D9E75" font-weight="bold">B</text><path d="M60,145 Q140,162 220,145" fill="none" stroke="#E24B4A" stroke-width="2"/><text x="46" y="143" font-size="11" fill="#E24B4A" font-weight="bold">C</text></svg>`,
+
+fig_sunrise:`<svg viewBox="0 0 290 105" width="270" height="105" xmlns="http://www.w3.org/2000/svg"><g transform="translate(5,8)"><rect x="0" y="0" width="80" height="90" fill="#f0f8ff" rx="3"/><circle cx="40" cy="68" r="16" fill="#FAEEDA" stroke="#EF9F27" stroke-width="1.5"/><rect x="0" y="52" width="80" height="38" fill="#8B7355" opacity="0.15"/><line x1="0" y1="52" x2="80" y2="52" stroke="#555" stroke-width="2"/><text x="2" y="48" font-size="7" fill="#555">地平線</text><text x="40" y="100" font-size="11" fill="#333" text-anchor="middle" font-weight="bold">ア</text></g><g transform="translate(105,8)"><rect x="0" y="0" width="80" height="90" fill="#f0f8ff" rx="3"/><circle cx="40" cy="52" r="16" fill="#FAEEDA" stroke="#EF9F27" stroke-width="1.5"/><rect x="0" y="52" width="80" height="38" fill="#8B7355" opacity="0.15"/><line x1="0" y1="52" x2="80" y2="52" stroke="#555" stroke-width="2"/><rect x="24" y="52" width="32" height="18" fill="#8B7355" opacity="0.15"/><text x="40" y="100" font-size="11" fill="#6b6760" text-anchor="middle" font-weight="bold">イ</text></g><g transform="translate(205,8)"><rect x="0" y="0" width="80" height="90" fill="#f0f8ff" rx="3"/><circle cx="40" cy="32" r="16" fill="#FAEEDA" stroke="#EF9F27" stroke-width="1.5"/><rect x="0" y="52" width="80" height="38" fill="#8B7355" opacity="0.15"/><line x1="0" y1="52" x2="80" y2="52" stroke="#555" stroke-width="2"/><text x="40" y="100" font-size="11" fill="#6b6760" text-anchor="middle" font-weight="bold">ウ</text></g></svg>`,
+
+fig_taiyou_graph:`<svg viewBox="0 0 300 165" width="280" height="154" xmlns="http://www.w3.org/2000/svg"><rect x="38" y="8" width="250" height="130" fill="none" stroke="#1a1a18" stroke-width="1"/><text x="22" y="138" font-size="8" fill="#6b6760" text-anchor="middle">0°</text><text x="22" y="115" font-size="8" fill="#6b6760" text-anchor="middle">20°</text><text x="22" y="92" font-size="8" fill="#6b6760" text-anchor="middle">40°</text><text x="22" y="69" font-size="8" fill="#6b6760" text-anchor="middle">60°</text><text x="22" y="46" font-size="8" fill="#6b6760" text-anchor="middle">80°</text><line x1="38" y1="138" x2="288" y2="138" stroke="#e2ddd6" stroke-width="0.5"/><line x1="38" y1="115" x2="288" y2="115" stroke="#e2ddd6" stroke-width="0.5"/><line x1="38" y1="92" x2="288" y2="92" stroke="#e2ddd6" stroke-width="0.5"/><line x1="38" y1="69" x2="288" y2="69" stroke="#e2ddd6" stroke-width="0.5"/><line x1="38" y1="46" x2="288" y2="46" stroke="#e2ddd6" stroke-width="0.5"/><text x="55" y="155" font-size="8" fill="#6b6760" text-anchor="middle">10時</text><text x="96" y="155" font-size="8" fill="#6b6760" text-anchor="middle">11時</text><text x="138" y="155" font-size="8" fill="#6b6760" text-anchor="middle">12時</text><text x="179" y="155" font-size="8" fill="#6b6760" text-anchor="middle">13時</text><text x="221" y="155" font-size="8" fill="#6b6760" text-anchor="middle">14時</text><text x="263" y="155" font-size="8" fill="#6b6760" text-anchor="middle">15時</text><circle cx="55" cy="92" r="4" fill="none" stroke="#378ADD" stroke-width="2"/><text x="51" y="86" font-size="8" fill="#378ADD">①</text><circle cx="96" cy="69" r="4" fill="none" stroke="#378ADD" stroke-width="2"/><text x="92" y="63" font-size="8" fill="#378ADD">②</text><circle cx="138" cy="52" r="4" fill="none" stroke="#378ADD" stroke-width="2"/><text x="134" y="46" font-size="8" fill="#378ADD">③</text><circle cx="179" cy="69" r="4" fill="none" stroke="#378ADD" stroke-width="2"/><text x="175" y="63" font-size="8" fill="#378ADD">④</text><circle cx="221" cy="92" r="4" fill="none" stroke="#378ADD" stroke-width="2"/><text x="217" y="86" font-size="8" fill="#378ADD">⑤</text><circle cx="263" cy="112" r="4" fill="none" stroke="#378ADD" stroke-width="2"/><text x="259" y="106" font-size="8" fill="#378ADD">⑥</text><polyline points="55,92 96,69 138,52 179,69 221,92 263,112" fill="none" stroke="#378ADD" stroke-width="1.5" stroke-dasharray="4,2"/><text x="165" y="163" font-size="8" fill="#6b6760" text-anchor="middle">南 ← 方位 → ◇</text></svg>`,
+
+fig_chizukigou:`<svg viewBox="0 0 300 100" width="280" height="93" xmlns="http://www.w3.org/2000/svg"><g transform="translate(10,10)"><text x="22" y="32" font-size="22" fill="#1a1a18" text-anchor="middle">⛩</text><text x="22" y="48" font-size="9" fill="#6b6760" text-anchor="middle">神社</text></g><g transform="translate(60,10)"><text x="22" y="32" font-size="22" fill="#1a1a18" text-anchor="middle">卍</text><text x="22" y="48" font-size="9" fill="#6b6760" text-anchor="middle">寺院</text></g><g transform="translate(108,14)"><circle cx="14" cy="14" r="12" fill="none" stroke="#1a1a18" stroke-width="1.5"/><text x="14" y="18" font-size="12" fill="#1a1a18" text-anchor="middle">文</text><text x="14" y="44" font-size="9" fill="#6b6760" text-anchor="middle">ア</text></g><g transform="translate(155,14)"><rect x="2" y="2" width="22" height="22" fill="none" stroke="#1a1a18" stroke-width="1.5"/><text x="13" y="17" font-size="12" fill="#1a1a18" text-anchor="middle">文</text><text x="13" y="44" font-size="9" fill="#6b6760" text-anchor="middle">イ</text></g><g transform="translate(200,14)"><line x1="13" y1="0" x2="13" y2="20" stroke="#1a1a18" stroke-width="2"/><line x1="3" y1="7" x2="23" y2="7" stroke="#1a1a18" stroke-width="2"/><circle cx="13" cy="22" r="5" fill="none" stroke="#1a1a18" stroke-width="1.5"/><text x="13" y="44" font-size="9" fill="#6b6760" text-anchor="middle">エ</text></g><g transform="translate(245,14)"><rect x="2" y="8" width="22" height="16" fill="none" stroke="#1a1a18" stroke-width="1.5"/><polygon points="13,2 2,8 24,8" fill="none" stroke="#1a1a18" stroke-width="1.5"/><text x="13" y="44" font-size="9" fill="#6b6760" text-anchor="middle">ウ</text></g></svg>`,
+};
+
+// ===== QUESTIONS =====
+const ALL=[
+{subj:"国語",s:"漢字変換",q:"病気をナオす。（正しい漢字1字は？）",a:"治",cs:["治","直","癒","修"],fig:null},
+{subj:"国語",s:"漢字変換",q:"時計をナオす。（正しい漢字1字は？）",a:"直",cs:["治","直","修","換"],fig:null},
+{subj:"国語",s:"漢字変換",q:"先生にアう。（正しい漢字1字は？）",a:"会",cs:["会","合","逢","遇"],fig:null},
+{subj:"国語",s:"漢字変換",q:"意見がアう。（正しい漢字1字は？）",a:"合",cs:["会","合","逢","遇"],fig:null},
+{subj:"国語",s:"漢字変換",q:"責任をオう。（正しい漢字1字は？）",a:"負",cs:["負","追","背","担"],fig:null},
+{subj:"国語",s:"漢字変換",q:"理想をオう。（正しい漢字1字は？）",a:"追",cs:["負","追","背","担"],fig:null},
+{subj:"国語",s:"漢字変換",q:"五十メートルキョウソウで一着になった。（キョウソウの漢字は？）",a:"競走",cs:["競走","競争","協奏","強壮"],fig:null},
+{subj:"国語",s:"漢字変換",q:"プリントをインサツする。（インサツの漢字は？）",a:"印刷",cs:["印刷","引率","飲酒","院卒"],fig:null},
+{subj:"国語",s:"漢字変換",q:"ケンコウ診断を受ける。（ケンコウの漢字は？）",a:"健康",cs:["健康","権威","謙虚","顕光"],fig:null},
+{subj:"国語",s:"漢字変換",q:"駅のカイサツの前で待ち合わせよう。（カイサツの漢字は？）",a:"改札",cs:["改札","解察","会察","回刷"],fig:null},
+{subj:"国語",s:"漢字の成り立ち",q:"「草」はどの漢字の成り立ちですか？",a:"象形文字",exp:"象形文字は物の形をそのまま絵にして作った文字です。「草」は草の形をかたどって作られました。同じく「山」「川」「日」「月」なども象形文字です。",cs:["象形文字","指事文字","会意文字","形声文字"],fig:null},
+{subj:"国語",s:"漢字の成り立ち",q:"「森」はどの漢字の成り立ちですか？",a:"会意文字",exp:"会意文字は意味を持つ漢字を組み合わせて新しい意味を表した文字です。「森」は「木」を3つ組み合わせて「木がたくさんある場所」を表しています。「明」（日＋月）も会意文字です。",cs:["象形文字","指事文字","会意文字","形声文字"],fig:null},
+{subj:"国語",s:"漢字の成り立ち",q:"「下」はどの漢字の成り立ちですか？",a:"指事文字",exp:"指事文字は記号や点・線で意味を表した文字です。「下」は線の下に点を打って「下の方向」を表しています。「上」「一」「二」「三」なども指事文字です。",cs:["象形文字","指事文字","会意文字","形声文字"],fig:null},
+{subj:"国語",s:"漢字の成り立ち",q:"「馬」はどの漢字の成り立ちですか？",a:"象形文字",exp:"「馬」は馬の姿をそのまま絵にした象形文字です。古代の文字（甲骨文字）では馬の頭・たてがみ・足などの形がはっきり見て取れます。",cs:["象形文字","指事文字","会意文字","形声文字"],fig:null},
+{subj:"国語",s:"語句の意味",q:"「はにかむ」の意味は？",a:"恥ずかしがる",exp:"「はにかむ」は恥ずかしそうにするという意味です。人前に出たり褒められたりして，照れて顔を赤くするようすを表します。",cs:["恥ずかしがる","驚く","怒る","悲しむ"],fig:null},
+{subj:"国語",s:"語句の意味",q:"「まぬがれる」の意味は？",a:"免れる・逃れる",exp:"「まぬがれる」は危険や災いなどをうまく逃れるという意味です。「難を免れる」のように，悪い状況をさけることができたときに使います。",cs:["免れる・逃れる","近づく","忘れる","集まる"],fig:null},
+{subj:"国語",s:"語句の意味",q:"「たたずむ」の意味は？",a:"じっと立つ",exp:"「たたずむ」はその場にじっと立ち止まっているようすを表します。「橋のほとりにたたずむ」のように，動かずにしばらくそこにいるイメージです。",cs:["じっと立つ","走り回る","考え込む","喜ぶ"],fig:null},
+{subj:"国語",s:"語句の意味",q:"「ねぎらう」の意味は？",a:"目下の者に感謝の言葉などをかける",exp:"「ねぎらう」は苦労した人に感謝やいたわりの言葉をかけることです。目上の人に対しては使わず，「お疲れさまでした」のような場面で使います。",cs:["目下の者に感謝の言葉などをかける","相手をしかる","励ます","命令する"],fig:null},
+{subj:"国語",s:"漢和辞典",q:"接・拾・打・投 を漢和辞典順に並べると最後は？",a:"投",cs:["接","拾","打","投"],fig:null},
+{subj:"国語",s:"漢和辞典",q:"門・間・問・聞 を漢和辞典順に並べると最後は？",a:"聞",cs:["門","間","問","聞"],fig:null},
+{subj:"理科",s:"光の性質",q:"虫めがねを通った光が折れ曲がって進む現象を何といいますか？",a:"光の屈折",exp:"光が水やガラスなど透明なものを通るときに折れ曲がる性質を「屈折」といいます。虫めがねのレンズは中央がふくらんでいるため光を屈折させて一点に集めます。",cs:["光の直進","光の反射","光の屈折"],fig:"fig_kusse"},
+{subj:"理科",s:"虫めがね・距離",q:"虫めがねと工作用紙の距離が2cmのとき，うつる形はア・イのどちら？",a:"ア",exp:"距離が短い（焦点より近い）と，光が一点に集まらず，明るい部分が広く大きくうつります。距離が長くなると暗い部分が広くなります。",cs:["ア","イ"],fig:"fig_mado"},
+{subj:"理科",s:"虫めがね・焦点",q:"直径が同じ虫めがねで，ふくらみが大きくなると，光が一点に集まる距離はどうなる？",a:"短くなる",exp:"ふくらみが大きい（厚い）レンズほど光を大きく屈折させるため，より近い距離で光が一点に集まります。これを焦点距離が短いといいます。",cs:["長くなる","短くなる","変わらない"],fig:null},
+{subj:"理科",s:"ピンホールカメラ",q:"ピンホールカメラは光のどんな性質を利用していますか？",a:"光の直進",exp:"光はまっすぐ進む（直進する）性質があります。ピンホールカメラでは小さな穴を通った光が直進し，スクリーンに上下左右が逆になった像をうつします。",cs:["光の直進","光の反射","光の屈折"],fig:null},
+{subj:"理科",s:"太陽の高度グラフ",q:"グラフの①〜⑥のうち，太陽の高度が最も高いのはどれですか？",a:"③",exp:"太陽は東から昇り，南を通って西に沈みます。最も高くなるのは南を通る正午ごろで，グラフでは南に最も近い③が最高点です。",cs:["①","③","⑥"],fig:"fig_taiyou_graph"},
+{subj:"理科",s:"太陽の方位",q:"グラフで，◇にあてはまる方位は？（太陽は東→南→西と動く）",a:"北",exp:"太陽は南の空を通るので，観察者は南を向いて記録します。グラフの手前（南）の反対，つまり奥側が北になります。◇は南の反対側なので「北」です。",cs:["東","西","南","北"],fig:"fig_taiyou_graph"},
+{subj:"理科",s:"南中",q:"太陽が真南にくることを何といいますか？",a:"南中",exp:"太陽が真南にきて高度が最も高くなる瞬間を「南中」といいます。南中した時刻を「南中時刻」，そのときの高度を「南中高度」といいます。",cs:["南中","日の出","日の入り","正午"],fig:null},
+{subj:"理科",s:"南中の時刻",q:"太陽が真南にくる時刻の正しい説明は？",a:"東の地方ほど早く，西の地方ほど遅い",exp:"地球は西から東へ自転しているため，東の地方ほど太陽が先に南にきます。日本では東にある東京の方が，西にある大阪より南中時刻が早くなります。",cs:["東の地方ほど早く，西の地方ほど遅い","西の地方ほど早く，東の地方ほど遅い","どの地方でも同じ"],fig:null},
+{subj:"理科",s:"影の軌跡",q:"A〜Cのうち，冬至の日の記録はどれですか？（冬至は太陽の高度が最も低い日）",a:"C",exp:"太陽の高度が低いほど影は長くなります。冬至は1年で最も太陽が低いので影が最も長く，軌跡は下（南から遠い）に弧を描くCになります。Aが夏至，Bが春分・秋分です。",cs:["A","B","C"],fig:"fig_kage_abc"},
+{subj:"理科",s:"影の方向",q:"秋分の日（B）に，影の先が動いた方向は⑧・⑨のどちら？",a:"⑧",exp:"太陽は東→南→西と動くので，影はその反対の西→北→東と動きます。午前中は西側に影ができ，時間とともに東へ移動するので⑧（西から東）の方向になります。",cs:["⑧","⑨"],fig:"fig_kage_abc"},
+{subj:"理科",s:"日の出",q:"日の出のしゅん間のようすとして正しいものは？（ア：地平線の下，イ：半分出ている，ウ：完全に出ている）",a:"ア",exp:"「日の出」とは太陽が地平線から出始める瞬間のことです。まだ地平線の下にある状態（ア）が日の出の瞬間にあたります。",cs:["ア","イ","ウ"],fig:"fig_sunrise"},
+{subj:"理科",s:"太陽の大きさ",q:"太陽の直径は地球の直径の約何倍ですか？",a:"約109倍",exp:"太陽の直径は約140万kmで，地球の直径（約1.3万km）の約109倍もあります。また太陽は地球から約1億5000万km離れています。",cs:["約4倍","約109倍","約400倍"],fig:null},
+{subj:"理科",s:"水と氷",q:"水が氷になると体積はどうなりますか？",a:"約1.1倍にふえる",exp:"水が氷になると体積は約1.1倍（約10%）増えます。重さは変わりませんが体積が増えるため密度が小さくなり，氷は水に浮きます。水が液体→気体になると約1600倍になります。",cs:["約1.1倍にふえる","約1600倍にふえる","変わらない"],fig:null},
+{subj:"理科",s:"サクラ・開花前線",q:"開花前線からわかることとして正しいものは？",a:"南から北へと開花が移っていく",exp:"開花前線は同じ日に花が咲き始める地点を結んだ線です。日本では暖かい南（九州など）から先に咲き始め，時間とともに北（東北・北海道）へと移っていきます。",cs:["南から北へと開花が移っていく","北から南へと移っていく","どの地方でもほぼ同じ"],fig:null},
+{subj:"理科",s:"春の植物",q:"春になってから種子をまく植物はどれですか？",a:"キュウリ",exp:"キュウリは春（4〜5月）に種をまく夏野菜です。チューリップは秋に球根を植え春に咲きます。アブラナは秋に種をまいて春に咲く植物です。",cs:["キュウリ","チューリップ","アブラナ"],fig:null},
+{subj:"理科",s:"渡り鳥",q:"春に南の国から渡ってきて日本で産卵する渡り鳥は？",a:"ツバメ",exp:"ツバメは春に東南アジアなど南の国から渡ってきて日本で巣を作り産卵します。このような鳥を「夏鳥」といいます。秋になると再び南へ帰ります。",cs:["ツバメ","オオタカ","カラス","ペンギン"],fig:null},
+{subj:"社会",s:"地図記号",q:"図の地図記号のうち，ア（丸の中に文）は何を表しますか？",a:"高等学校",exp:"丸（○）の中に「文」の字が入った記号は高等学校を表します。四角（□）の中に「文」が入っていると小・中学校です。形の違いで学校の種類を区別します。",cs:["高等学校","小学校","中学校","大学"],fig:"fig_chizukigou"},
+{subj:"社会",s:"地図記号",q:"図の地図記号のうち，ウ（家の形）は何を表しますか？",a:"老人ホーム",exp:"屋根のある家の形をした記号は老人ホームを表します。2006年に新しく作られた地図記号で，高齢化社会に合わせて追加されました。",cs:["老人ホーム","神社","市役所","消防署"],fig:"fig_chizukigou"},
+{subj:"社会",s:"地図記号",q:"図のエ（棒＋プロペラの形）は「□力発電の□車」の記号。□にあてはまる漢字1字は？",a:"風",exp:"風車の形をした記号は「風力発電所」を表します。棒の上にプロペラ（羽）の形が風車に見えます。2013年に新しく作られた地図記号です。",cs:["風","水","火","電"],fig:"fig_chizukigou"},
+{subj:"社会",s:"縮尺",q:"縮尺25000分の1の地図で，地図上2cmの実際の距離は？",a:"500m",exp:"縮尺25000分の1とは，地図上の1cmが実際の25000cmであることを意味します。2cm × 25000 = 50000cm = 500mになります。",cs:["50m","500m","5000m"],fig:null},
+{subj:"社会",s:"標高",q:"標高の基準となる場所はどこの海面ですか？",a:"東京湾の平均海面",exp:"標高は東京湾の平均海面の高さを0mとして，土地の高さを表したものです。この基準点は東京都千代田区にある「日本水準原点」に記されています。",cs:["東京湾の平均海面","太平洋の平均海面","大阪湾の平均海面"],fig:null},
+{subj:"社会",s:"関東地方",q:"茨城県の県庁所在地はどこですか？",a:"水戸市",cs:["水戸市","つくば市","土浦市","日立市"],fig:null},
+{subj:"社会",s:"関東地方",q:"栃木県の県庁所在地はどこですか？",a:"宇都宮市",cs:["宇都宮市","小山市","足利市","那須塩原市"],fig:null},
+{subj:"社会",s:"関東地方",q:"関東地方で海に面していない内陸の県は？（全部選ぶと）",a:"群馬県・栃木県・埼玉県",cs:["群馬県・栃木県・埼玉県","群馬県・栃木県","埼玉県・山梨県","群馬県・埼玉県・茨城県"],fig:null},
+{subj:"社会",s:"関東地方",q:"関東地方で人口が最も多い都県は？",a:"東京都",cs:["東京都","神奈川県","埼玉県","千葉県"],fig:null},
+{subj:"社会",s:"関東地方",q:"千葉県は昔，何という国でしたか？",a:"下総・上総・安房",cs:["下総・上総・安房","武蔵","常陸","相模"],fig:null},
+{subj:"社会",s:"中部地方",q:"長野県が接している地方として正しいものは？",a:"東北地方と関東地方",exp:"長野県は中部地方に属しますが，北側で新潟県（中部）・群馬県（関東）・埼玉県（関東）と接し，関東地方と東北地方のどちらにも接しています。",cs:["東北地方のみ","関東地方のみ","東北地方と関東地方"],fig:null},
+{subj:"社会",s:"中部地方",q:"愛知県の県庁所在地はどこですか？",a:"名古屋市",cs:["名古屋市","静岡市","浜松市","津市"],fig:null},
+{subj:"社会",s:"中部地方",q:"昔「信濃」とよばれた国は，今の何県ですか？",a:"長野県",cs:["長野県","新潟県","石川県","岐阜県"],fig:null},
+{subj:"社会",s:"中部地方",q:"石川県の県庁所在地はどこですか？",a:"金沢市",cs:["金沢市","福井市","富山市","輪島市"],fig:null},
+{subj:"社会",s:"中部地方",q:"昔「甲斐」とよばれた国は，今の何県ですか？",a:"山梨県",cs:["山梨県","長野県","静岡県","岐阜県"],fig:null},
+{subj:"社会",s:"中部地方",q:"富山県・石川県・福井県をまとめて何地方とよびますか？",a:"北陸地方",cs:["北陸地方","山陰地方","東海地方","甲信越地方"],fig:null},
+{subj:"社会",s:"九州地方",q:"長崎県が陸続きで接している県はどこですか？",a:"佐賀県",cs:["佐賀県","福岡県","熊本県","大分県"],fig:null},
+{subj:"社会",s:"九州地方",q:"福岡県の県庁所在地はどこですか？また，そこには古くから何とよばれる地域がありますか？",a:"福岡市・博多",cs:["福岡市・博多","北九州市・小倉","大牟田市・有明","久留米市・筑後"],fig:null},
+{subj:"社会",s:"九州地方",q:"鹿児島県にある2つの大きな半島の名前は？",a:"薩摩半島と大隅半島",cs:["薩摩半島と大隅半島","島原半島と国東半島","志摩半島と知多半島","男鹿半島と津軽半島"],fig:null},
+{subj:"社会",s:"九州地方",q:"大分県・宮崎県・熊本県・鹿児島県の4県すべてに接している県はどこですか？",a:"熊本県",exp:"熊本県は九州のほぼ中央に位置しており，大分県・宮崎県・鹿児島県・福岡県・佐賀県・長崎県の6県と接しています。九州で最も多くの県と接しています。",cs:["熊本県","福岡県","佐賀県","長崎県"],fig:null},
+{subj:"社会",s:"沖縄",q:"沖縄県の県庁所在地はどこですか？",a:"那覇市",cs:["那覇市","高松市","大津市","名護市"],fig:null},
+{subj:"社会",s:"沖縄",q:"東京から沖縄島までのおよその距離は？",a:"約1200km",cs:["約800km","約1200km","約1600km"],fig:null},
+{subj:"社会",s:"沖縄",q:"沖縄がかつて□王国だったとき，国王が住んでいた城はどこですか？",a:"首里城",exp:"首里城は琉球王国の国王が住んでいた城です。那覇市にあり，2019年に火災で焼失しましたが，現在復元工事が進められています。",cs:["首里城","姫路城","熊本城","名護城"],fig:null},
+{subj:"社会",s:"沖縄",q:"沖縄はかつて何王国とよばれていましたか？",a:"琉球王国",cs:["琉球王国","伊予王国","筑後王国","薩摩王国"],fig:null},
+];
+
+// ===== STATE =====
+let mode=null, filter='all', qs=[], idx=0;
+let status=[]; // 'none','ok','again' per question
+let flipped=false;
+let timerInterval=null, timeLeft=0, totalTime=0, atAnswered=false;
+let atScore=0, atWrong=[], atSubScores={国語:0,理科:0,社会:0}, atSubTotal={国語:0,理科:0,社会:0};
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+const R=document.getElementById('root');
+
+// ===== TOP =====
+function showTop(){
+  clearInterval(timerInterval);
+  const pool=filter==='all'?ALL:ALL.filter(q=>q.subj===filter);
+  R.innerHTML=`
+  <div class="top">
+    <div class="top-title">組み分けテスト（5月）<br>対策クイズ</div>
+    <div class="top-sub">国語・社会・理科 全${ALL.length}問</div>
+    <div class="filter-row">
+      <button class="fbtn${filter==='all'?' on':''}" onclick="setFilter('all')">全科目（${ALL.length}）</button>
+      <button class="fbtn${filter==='国語'?' on':''}" onclick="setFilter('国語')">✏️ 国語（${ALL.filter(q=>q.subj==='国語').length}）</button>
+      <button class="fbtn${filter==='理科'?' on':''}" onclick="setFilter('理科')">🔬 理科（${ALL.filter(q=>q.subj==='理科').length}）</button>
+      <button class="fbtn${filter==='社会'?' on':''}" onclick="setFilter('社会')">🗾 社会（${ALL.filter(q=>q.subj==='社会').length}）</button>
+    </div>
+    <div class="mode-grid">
+      <div class="mcard" onclick="startCard()">
+        <div class="mcard-icon">📚</div>
+        <div class="mcard-title">覚えるカード</div>
+        <div class="mcard-desc">カードをめくって答えを確認。「わかった！」「もう一度」で仕分けしながら学習できます。前後に自由に移動できます。</div>
+      </div>
+      <div class="mcard" onclick="startAttack()">
+        <div class="mcard-icon">⏱️</div>
+        <div class="mcard-title">タイムアタック</div>
+        <div class="mcard-desc">1問30秒！選択肢から選ぶ形式。スピード勝負で実力を試そう。</div>
+      </div>
+    </div>
+    <div class="count-note">${pool.length}問が出題されます</div>
+  </div>`;
+}
+function setFilter(f){filter=f;showTop();}
+
+// ===== CARD MODE =====
+let cardStage='question'; // 'question' | 'choices' | 'answer'
+let choiceResult=null;    // null | 'correct' | 'wrong'
+let shuffledChoices=[];
+
+function startCard(){
+  const pool=filter==='all'?ALL:ALL.filter(q=>q.subj===filter);
+  qs=[...pool];
+  status=qs.map(()=>'none');
+  idx=0;flipped=false;cardStage='question';choiceResult=null;shuffledChoices=[];
+  renderCard();
+}
+
+function renderCard(){
+  const q=qs[idx];
+  const tot=qs.length;
+  const okCount=status.filter(s=>s==='ok').length;
+  const againCount=status.filter(s=>s==='again').length;
+  const figHtml=q.fig?`<div class="flip-fig">${F[q.fig]}</div>`:'';
+  const dotsHtml=qs.map((_,i)=>{
+    let cls='dot';
+    if(i===idx)cls+=' current';
+    else if(status[i]==='ok')cls+=' ok';
+    else if(status[i]==='again')cls+=' again';
+    return `<div class="${cls}" onclick="jumpTo(${i})" title="${i+1}問目"></div>`;
+  }).join('');
+
+  let mainHtml='';
+
+  if(cardStage==='question'){
+    mainHtml=`
+      <div class="c-card">
+        ${figHtml}
+        <div class="c-q">${q.q}</div>
+      </div>
+      <div class="hint-row">💡 まず自分で考えてみよう</div>
+      <div class="action-row">
+        <button class="action-btn btn-hint" onclick="showChoices()">🔢 4択にする</button>
+        <button class="action-btn btn-reveal" onclick="showAnswer()">答えを見る</button>
+      </div>`;
+
+  } else if(cardStage==='choices'){
+    const choicesBtns=shuffledChoices.map(c=>{
+      let cls='cbtn';
+      if(choiceResult){
+        if(c===q.a) cls+=' reveal';
+        else if(c===choiceResult&&c!==q.a) cls+=' wrong';
+      }
+      const disabled=choiceResult?'disabled':'';
+      const safe=c.replace(/'/g,"\\'");
+      return `<button class="${cls}" ${disabled} onclick="pickChoice('${safe}')">${c}</button>`;
+    }).join('');
+    const fbHtml=choiceResult
+      ? choiceResult==='correct'
+        ? `<div class="fb show ok">✓ 正解！</div>`
+        : `<div class="fb show ng">✗ 不正解。正解は「${q.a}」です。</div>`
+      : '';
+    mainHtml=`
+      <div class="c-card">
+        ${figHtml}
+        <div class="c-q">${q.q}</div>
+      </div>
+      <div class="choices" style="margin:.75rem 0;">${choicesBtns}</div>
+      ${fbHtml}
+      ${choiceResult?`<div class="action-row" style="margin-top:.75rem;">
+        <button class="action-btn btn-reveal" onclick="showAnswer()">答えを確認する</button>
+      </div>`:''}`;
+
+  } else {
+    const resultBadge=choiceResult==='correct'
+      ? `<div style="font-size:12px;color:var(--green-text);margin-bottom:.5rem;">✓ 4択で正解しました</div>`
+      : choiceResult==='wrong'
+      ? `<div style="font-size:12px;color:var(--red);margin-bottom:.5rem;">✗ 4択で不正解でした</div>`
+      : '';
+    const expHtml=q.exp?`<div class="c-exp">💡 ${q.exp}</div>`:'';
+    mainHtml=`
+      <div class="c-card c-card-answer">
+        ${figHtml}
+        <div class="c-q" style="margin-bottom:.75rem;">${q.q}</div>
+        ${resultBadge}
+        <div class="c-a">✅ ${q.a}</div>
+      </div>
+      ${expHtml}
+      <div class="action-row">
+        <button class="action-btn btn-again" onclick="markAgain()">😓 もう一度</button>
+        <button class="action-btn btn-ok" onclick="markOk()">✅ わかった！</button>
+      </div>`;
+  }
+  }
+
+  R.innerHTML=`
+  <div class="card-screen">
+    <div class="card-header">
+      <button class="back-btn" onclick="showTop()">←</button>
+      <div class="header-info">${idx+1} / ${tot}　✅${okCount}　😓${againCount}</div>
+    </div>
+    <div class="prog-bar-wrap"><div class="prog-bar" style="width:${((idx+1)/tot)*100}%"></div></div>
+    <div class="dots-wrap">${dotsHtml}</div>
+    <span class="sbadge sbadge-${q.subj}">${q.subj}</span>
+    <div class="section-name">${q.s}</div>
+    ${mainHtml}
+    <div class="nav-row" style="margin-top:1rem;">
+      <button class="nav-btn" onclick="prevQ()" ${idx===0?'disabled':''}>← 前へ</button>
+      <div class="nav-center">
+        <button class="shuffle-btn" onclick="doShuffle()">🔀</button>
+      </div>
+      <button class="nav-btn" onclick="nextQ()" ${idx===tot-1?'disabled':''}>次へ →</button>
+    </div>
+    ${okCount+againCount===tot?`<div class="card-result" style="margin-top:1rem;">
+      <div style="font-size:14px;color:var(--text2);margin-bottom:.5rem;">全問チェック完了！</div>
+      <div>✅ わかった：<strong style="color:var(--green-text)">${okCount}</strong>問　😓 もう一度：<strong style="color:var(--red)">${againCount}</strong>問</div>
+      <div class="rbtn-row" style="margin-top:1rem;">
+        <button class="rbtn" onclick="startCard()">もう一度</button>
+        <button class="rbtn primary" onclick="retryAgain()">😓のみ再挑戦</button>
+      </div>
+    </div>`:''}
+  </div>`;
+}
+
+function showChoices(){shuffledChoices=shuffle([...qs[idx].cs]);choiceResult=null;cardStage='choices';renderCard();}
+function pickChoice(c){choiceResult=c===qs[idx].a?'correct':'wrong';renderCard();}
+function showAnswer(){cardStage='answer';renderCard();}
+function doFlip(){showAnswer();}
+function jumpTo(i){idx=i;cardStage='question';choiceResult=null;shuffledChoices=[];renderCard();}
+function prevQ(){if(idx>0){idx--;cardStage='question';choiceResult=null;shuffledChoices=[];renderCard();}}
+function nextQ(){if(idx<qs.length-1){idx++;cardStage='question';choiceResult=null;shuffledChoices=[];renderCard();}}
+function markOk(){status[idx]='ok';if(idx<qs.length-1){idx++;cardStage='question';choiceResult=null;shuffledChoices=[];}renderCard();}
+function markAgain(){status[idx]='again';if(idx<qs.length-1){idx++;cardStage='question';choiceResult=null;shuffledChoices=[];}renderCard();}
+function doShuffle(){
+  const combined=qs.map((q,i)=>({q,s:status[i]}));
+  for(let i=combined.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[combined[i],combined[j]]=[combined[j],combined[i]];}
+  qs=combined.map(c=>c.q);status=combined.map(c=>c.s);
+  idx=0;cardStage='question';choiceResult=null;shuffledChoices=[];renderCard();
+}
+function retryAgain(){
+  const wrongQs=qs.filter((_,i)=>status[i]==='again');
+  if(wrongQs.length===0){alert('😓の問題はありません！');return;}
+  qs=wrongQs;status=qs.map(()=>'none');
+  idx=0;cardStage='question';choiceResult=null;shuffledChoices=[];renderCard();
+}
+
+
+// ===== ATTACK MODE =====
+function startAttack(){
+  const pool=filter==='all'?ALL:ALL.filter(q=>q.subj===filter);
+  qs=shuffle(pool);
+  idx=0;atScore=0;atWrong=[];atAnswered=false;
+  atSubScores={国語:0,理科:0,社会:0};
+  atSubTotal={国語:0,理科:0,社会:0};
+  qs.forEach(q=>atSubTotal[q.subj]=(atSubTotal[q.subj]||0)+1);
+  totalTime=qs.length*30;timeLeft=qs.length*30;
+  renderAttack();
+}
+
+function renderAttack(){
+  clearInterval(timerInterval);
+  if(idx>=qs.length){showAttackResult();return;}
+  const q=qs[idx];
+  const tot=qs.length;
+  const qTime=30;
+  const sh=shuffle(q.cs);
+  const figHtml=q.fig?`<div class="qfig">${F[q.fig]}</div>`:'';
+
+  R.innerHTML=`
+  <div class="attack-screen">
+    <div class="attack-header">
+      <button class="back-btn" onclick="showTop()">←</button>
+      <span class="sbadge sbadge-${q.subj}">${q.subj}</span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:13px;color:var(--text2)">${idx+1}/${tot}</span>
+        <div class="timer-box" id="timer">${qTime}s</div>
+      </div>
+    </div>
+    <div class="prog-bar-wrap"><div class="prog-bar" style="width:${(idx/tot)*100}%"></div></div>
+    <div class="atbar-wrap"><div class="atbar" id="atbar" style="width:100%"></div></div>
+    <div class="qcard">
+      <div class="section-name">${q.s}</div>
+      <div class="qtext">${q.q}</div>
+      ${figHtml}
+      <div class="choices" id="ch">
+        ${sh.map(c=>`<button class="cbtn" data-val="${c.replace(/"/g,'&quot;')}" onclick="atChoose(this)">${c}</button>`).join('')}
+      </div>
+      <div class="fb" id="fb"></div>
+    </div>
+    <div class="anav"><button class="anext" id="anext" onclick="atNext()">次の問題 →</button></div>
+  </div>`;
+
+  atAnswered=false;
+  let qLeft=qTime;
+  timerInterval=setInterval(()=>{
+    qLeft--;timeLeft--;
+    const tel=document.getElementById('timer');
+    const tbar=document.getElementById('atbar');
+    if(tel){tel.textContent=qLeft+'s';tel.className='timer-box'+(qLeft<=5?' warn':'');}
+    if(tbar)tbar.style.width=(qLeft/qTime*100)+'%';
+    if(qLeft<=0){clearInterval(timerInterval);if(!atAnswered)atAutoSkip();}
+  },1000);
+}
+
+function atChoose(btn){
+  if(atAnswered)return;atAnswered=true;
+  clearInterval(timerInterval);
+  const chosen=btn.dataset.val, answer=qs[idx].a;
+  document.querySelectorAll('.cbtn').forEach(b=>{b.disabled=true;if(b.dataset.val===answer)b.classList.add('reveal');});
+  const fb=document.getElementById('fb');
+  if(chosen===answer){
+    btn.classList.remove('reveal');btn.classList.add('correct');
+    fb.textContent='✓ 正解！';fb.className='fb show ok';
+    atScore++;atSubScores[qs[idx].subj]=(atSubScores[qs[idx].subj]||0)+1;
+  }else{
+    btn.classList.add('wrong');
+    fb.textContent='✗ 不正解。正解は「'+answer+'」です。';fb.className='fb show ng';
+    atWrong.push(qs[idx]);
+  }
+  document.getElementById('anext').className='anext show';
+}
+function atAutoSkip(){
+  if(atAnswered)return;atAnswered=true;
+  const answer=qs[idx].a;
+  document.querySelectorAll('.cbtn').forEach(b=>{b.disabled=true;if(b.dataset.val===answer)b.classList.add('reveal');});
+  const fb=document.getElementById('fb');
+  fb.textContent='⏰ 時間切れ！正解は「'+answer+'」です。';fb.className='fb show ng';
+  atWrong.push(qs[idx]);
+  document.getElementById('anext').className='anext show';
+}
+function atNext(){idx++;renderAttack();}
+
+function showAttackResult(){
+  clearInterval(timerInterval);
+  const tot=qs.length;
+  const pct=Math.round(atScore/tot*100);
+  const comment=pct>=90?'🎉 すばらしい！':pct>=70?'👍 よくできました！':pct>=50?'📚 もう一息！':'💪 もっと練習しよう！';
+  const bdHtml=['国語','理科','社会'].map(s=>`
+    <div class="bd-card">
+      <div class="bd-label">${s}</div>
+      <div class="bd-score">${atSubScores[s]||0}／${atSubTotal[s]||0}</div>
+    </div>`).join('');
+  const wrongHtml=atWrong.length>0?`
+    <div class="wrong-list">
+      <h3>📝 間違えた問題（${atWrong.length}問）</h3>
+      ${atWrong.map(q=>`<div class="wrong-item">${q.q}<br><span class="wa">→ ${q.a}</span></div>`).join('')}
+    </div>`:'';
+
+  R.innerHTML=`
+  <div class="result">
+    <div style="font-size:13px;color:var(--text2);margin-bottom:.5rem;">⏱️ タイムアタック 完了！</div>
+    <div class="result-big">${atScore}</div>
+    <div class="result-of">／${tot}問正解（${pct}%）</div>
+    <div class="result-comment">${comment}</div>
+    <div class="bd-grid">${bdHtml}</div>
+    ${wrongHtml}
+    <div class="rbtn-row">
+      <button class="rbtn" onclick="showTop()">トップに戻る</button>
+      <button class="rbtn primary" onclick="startAttack()">もう一度！</button>
+    </div>
+  </div>`;
+}
+
+showTop();
+</script>
+</body>
+</html>
